@@ -8,7 +8,7 @@ Video overview: <https://youtu.be/pUtI4ux0a0Q>
 
 The purpose of this database is to have an audit trail of the scripts and processes that are executed in an accounting enviroment.
 
-* Which people, places, things, etc. are you including in the scope of your database?
+* Which people, places, things, etc. are included in the scope of your database?
 
 - Accounting department users that are using the scripts
 - The input data from the ERP
@@ -16,7 +16,7 @@ The purpose of this database is to have an audit trail of the scripts and proces
 - The name and details of the scripts that were used
 - An error/ process status table
 
-* Which people, places, things, etc. are *outside* the scope of your database?
+* Which people, places, things, etc. are *outside* the scope of the database?
 
 - Financial data stored inside Oracle Fusion
 - Validation of accounting data correctness
