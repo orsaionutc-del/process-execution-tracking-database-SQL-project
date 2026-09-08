@@ -60,5 +60,23 @@ JOIN INPUTS i
 JOIN OUTPUTS o
     ON e.execution_id = o.execution_id;
 
---SQL query that returns the processes with the most errors
+--SQL query that returns top 3 processes with the most failed executions and the number of failed executions so the dev team can improve them
+
+WITH error_count AS (
+SELECT p.name, COUNT(p.process_id) AS error_num
+FROM EXECUTIONS AS e
+JOIN PROCESSES AS p
+  ON p.process_id = e.process_id
+WHERE e.status = 'FAILED' AND p.deleted = 0
+GROUP BY p.process_id ),
+
+ranking AS (
+  SELECT name, error_num, ROW_NUMBER() OVER ( ORDER BY error_num DESC ) AS rank
+  FROM error_count 
+  )
+
+SELECT name, error_num
+FROM ranking
+WHERE rank < 4
+ORDER BY rank
 
