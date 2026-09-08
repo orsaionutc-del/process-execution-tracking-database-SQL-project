@@ -18,7 +18,7 @@ The purpose of this database is to have an audit trail of the scripts and proces
 
 * Which people, places, things, etc. are *outside* the scope of the database?
 
-- Financial data stored inside Oracle Fusion
+- Financial data stored inside the ERP
 - Validation of accounting data correctness
 - Business approval workflows
 
