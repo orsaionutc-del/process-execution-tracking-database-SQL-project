@@ -93,4 +93,21 @@ JOIN ERRORS er
 
 ALTER TABLE EXECUTIONS
 ADD CONSTRAINT chk_status
-CHECK (status IN ('SUCCESS','FAILED','RUNNING'));
+CHECK (status IN ('SUCCESS','FAILED','RUNNING'))
+
+DELIMITER //
+CREATE PROCEDURE GetBatchErrors(IN param_batch_id INT)
+BEGIN
+    SELECT
+        e.execution_id,
+        e.executed_at,
+        e.status,
+        er.error_msg
+    FROM EXECUTIONS e
+    JOIN ERRORS er
+        ON e.execution_id = er.execution_id
+    WHERE e.batch_id = param_batch_id
+    ORDER BY e.executed_at DESC;
+END //
+DELIMITER
+;
