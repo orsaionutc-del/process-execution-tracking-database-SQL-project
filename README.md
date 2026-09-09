@@ -2,8 +2,6 @@
 
 By Orsa Ionut Cristian
 
-Video overview: <https://youtu.be/pUtI4ux0a0Q>
-
 ## Scope
 
 The purpose of this database is to have an audit trail of the scripts and processes that are executed in an accounting enviroment.
