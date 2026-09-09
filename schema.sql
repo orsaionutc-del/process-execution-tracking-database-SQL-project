@@ -1,7 +1,7 @@
     CREATE TABLE USERS (
         user_id SMALLINT AUTO_INCREMENT PRIMARY KEY,
-        first_name VARCHAR(20),
-        last_name VARCHAR(20)
+        first_name VARCHAR(20) NOT NULL,
+        last_name VARCHAR(20) NOT NULL
     );
 
     CREATE TABLE PROCESSES (
@@ -93,9 +93,10 @@ JOIN ERRORS er
 
 ALTER TABLE EXECUTIONS
 ADD CONSTRAINT chk_status
-CHECK (status IN ('SUCCESS','FAILED','RUNNING'))
+CHECK (status IN ('SUCCESS','FAILED','RUNNING'));
 
 -- Extract errors from batch stored procedure
+    
 DELIMITER //
 CREATE PROCEDURE GetBatchErrors(IN param_batch_id INT)
 BEGIN
@@ -110,16 +111,63 @@ BEGIN
     WHERE e.batch_id = param_batch_id
     ORDER BY e.executed_at DESC;
 END //
-DELIMITER
+DELIMITER;
 
---Insert another process in the processes table
+--Insert another process in the PROCESSES table
+    
 DELIMITER //
 CREATE PROCEDURE AddProcess(IN param_process_name VARCHAR(100))
 BEGIN
     INSERT INTO PROCESSES(name)
     VALUES(param_process_name);
 END //
-DELIMITER
+DELIMITER;
 
+--Add user in USERS table stored procedure
+    
+DELIMITER //
+CREATE PROCEDURE AddUser(IN param_fn VARCHAR(20), IN param_ln VARCHAR(20))
+BEGIN
+    INSERT INTO USERS(first_name, last_name)
+    VALUES (param_fn, param_ln);
+END //
+DELIMITER;
 
+--Edit DB name in USERS table stored procedure
+    
+DELIMITER //
+CREATE PROCEDURE ChangeName(IN param_fn VARCHAR(20),IN param_ln VARCHAR(20),IN par_id SMALLINT)
+BEGIN
+    UPDATE USERS
+    SET first_name = param_fn , last_name = param_ln
+    WHERE user_id = par_id;
+END //
+DELIMITER;
+
+--Stored Procedure that changes the name introduced wrong of a process
+DELIMITER //
+CREATE PROCEDURE CorrectProcessName(IN wrong_name VARCHAR(100),IN correct_name VARCHAR(100))
+BEGIN
+    UPDATE PROCESSES
+    SET name = correct_name
+    WHERE id = (
+        SELECT id
+        FROM PROCESSES
+        WHERE name = wrong_name
+    );
+END //
+DELIMITER;
+
+--SQL query to eliminate a user
+DELIMITER //
+CREATE PROCEDURE DeleteUser( IN param_fn VARCHAR(20), IN param_ln VARCHAR(20))
+BEGIN
+    DELETE FROM users
+    WHERE user_id = (
+        SELECT user_id
+        FROM USERS
+        WHERE first_name = param_fn AND last_name = param_ln
+    );
+END //
+DELIMITER;
 ;
