@@ -95,6 +95,7 @@ ALTER TABLE EXECUTIONS
 ADD CONSTRAINT chk_status
 CHECK (status IN ('SUCCESS','FAILED','RUNNING'))
 
+-- Extract errors from batch stored procedure
 DELIMITER //
 CREATE PROCEDURE GetBatchErrors(IN param_batch_id INT)
 BEGIN
@@ -110,4 +111,15 @@ BEGIN
     ORDER BY e.executed_at DESC;
 END //
 DELIMITER
+
+--Insert another process in the processes table
+DELIMITER //
+CREATE PROCEDURE AddProcess(IN param_process_name VARCHAR(100))
+BEGIN
+    INSERT INTO PROCESSES(name)
+    VALUES(param_process_name);
+END //
+DELIMITER
+
+
 ;
