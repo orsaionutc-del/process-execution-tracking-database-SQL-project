@@ -78,6 +78,7 @@ ON OUTPUTS(execution_id);
 CREATE INDEX idx_error_exec
 ON ERRORS(execution_id);
 
+-- execution summary
 CREATE VIEW execution_summary AS
 SELECT
     e.execution_id,
@@ -90,6 +91,7 @@ FROM EXECUTIONS e
 JOIN PROCESSES p ON e.process_id = p.process_id
 JOIN USERS u ON e.user_id = u.user_id;
 
+-- all the failed executions
 CREATE VIEW failed_executions AS
 SELECT
     execution_id,
@@ -99,6 +101,7 @@ SELECT
 FROM EXECUTIONS
 WHERE status = 'FAILED';
 
+-- all the executions and all the errors
 CREATE VIEW execution_errors AS
 SELECT
     e.execution_id,
@@ -108,12 +111,13 @@ FROM EXECUTIONS e
 JOIN ERRORS er
     ON e.execution_id = er.execution_id;
 
+-- statistics regarding total processes and their success
 CREATE VIEW process_statistics AS
 WITH exec_processes AS (
     SELECT
     process_id,
     COUNT(status) as total_executions,
-    SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) AS succesful_executions,
+    SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) AS successful_executions,
     SUM(CASE WHEN status = 'FAILED' THEN 1 ELSE 0 END) AS failed_executions,
     SUM(CASE WHEN status = 'RUNNING' THEN 1 ELSE 0 END) AS running_executions
 FROM EXECUTIONS
@@ -125,18 +129,42 @@ GROUP BY process_id
     COALESCE(e.total_executions,'0'), 
     COALESCE(e.succesful_executions, 0), 
     COALESCE(e.failed_executions, 0),
-    COALESCE(e.running_executions, 0)
+    COALESCE(e.running_executions, 0),
+    COALESCE(e.failed_executions, 0) / COALESCE(e.total_executions,'0') AS success_ratio
     FROM exec_processes AS e
     RIGHT JOIN PROCESSES AS p 
     ON e.process_id = p.process_id
     ;
 
-ALTER TABLE EXECUTIONS
-ADD CONSTRAINT chk_status
-CHECK (status IN ('SUCCESS','FAILED','RUNNING'));
+-- Number of executions/user
+CREATE VIEW user_execution_statistics AS
+    SELECT
+    u.user_id,
+    CONCAT(u.first_name,' ',u.last_name) AS full_name,
+    COALESCE(COUNT(e.execution_id),0) AS total_executions,
+    COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END),0) AS successful_executions,
+    COALESCE(SUM(CASE WHEN status = 'FAILED' THEN 1 ELSE 0 END),0) AS failed_executions,
+    COALESCE(SUM(CASE WHEN status = 'RUNNING' THEN 1 ELSE 0 END),0) AS running_executions
+    FROM EXECUTIONS AS e
+    RIGHT JOIN USERS AS u 
+    ON e.user_id = u.user_id
+    GROUP BY u.user_id, u.first_name, u.last_name;
+
+-- execution order + number of executions
+CREATE VIEW process_execution_ranking AS
+    SELECT
+    e.execution_id,
+    e.process_id,
+    p..process_name,
+    e.executed_at,
+    e.status,
+    COUNT(e.execution_id) OVER (PARTITION BY e.process_id) AS number_of_executions,
+    ROW_NUMBER() OVER (PARTITION BY e.process_id ORDER BY executed_at DESC) execution_order
+    FROM EXECUTIONS AS e
+    JOIN PROCESSES AS p
+    ON e.process_id = p.process_id;
 
 -- Extract errors from batch stored procedure
-    
 DELIMITER //
 CREATE PROCEDURE GetBatchErrors(IN param_batch_id INT)
 BEGIN
@@ -153,8 +181,7 @@ BEGIN
 END //
 DELIMITER;
 
---Insert another process in the PROCESSES table
-    
+--Insert another process in the PROCESSES table 
 DELIMITER //
 CREATE PROCEDURE AddProcess(IN param_process_name VARCHAR(100))
 BEGIN
@@ -163,8 +190,7 @@ BEGIN
 END //
 DELIMITER;
 
---Add user in USERS table stored procedure
-    
+--Add user in USERS table stored procedure   
 DELIMITER //
 CREATE PROCEDURE AddUser(IN param_fn VARCHAR(20), IN param_ln VARCHAR(20))
 BEGIN
@@ -173,8 +199,7 @@ BEGIN
 END //
 DELIMITER;
 
---Edit DB name in USERS table stored procedure
-    
+--Edit DB name in USERS table stored procedure   
 DELIMITER //
 CREATE PROCEDURE ChangeName(IN param_fn VARCHAR(20),IN param_ln VARCHAR(20),IN par_id SMALLINT)
 BEGIN
