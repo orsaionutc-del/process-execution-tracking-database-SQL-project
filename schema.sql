@@ -168,6 +168,11 @@ CREATE VIEW process_execution_ranking AS
 DELIMITER //
 CREATE PROCEDURE GetBatchErrors(IN param_batch_id INT)
 BEGIN
+    IF param_batch_id NOT IN (SELECT batch_id FROM EXECUTIONS) 
+    THEN 
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'This batch does not exist';
+    END IF;
     SELECT
         e.execution_id,
         e.executed_at,
@@ -185,6 +190,21 @@ DELIMITER;
 DELIMITER //
 CREATE PROCEDURE AddProcess(IN param_process_name VARCHAR(100))
 BEGIN
+    IF param_process_name IS NULL
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Please do not insert a NULL value';
+    END IF;
+    IF param_process_name = ''
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'This is an empty value';
+    END IF;
+    IF param_process_name IN (SELECT name FROM PROCESSES)
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You already have this process in the database';
+    END IF;
     INSERT INTO PROCESSES(name)
     VALUES(param_process_name);
 END //
