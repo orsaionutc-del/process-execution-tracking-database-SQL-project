@@ -126,11 +126,11 @@ GROUP BY process_id
     SELECT 
     p.name, 
     e.process_id, 
-    COALESCE(e.total_executions,'0'), 
-    COALESCE(e.succesful_executions, 0), 
-    COALESCE(e.failed_executions, 0),
-    COALESCE(e.running_executions, 0),
-    COALESCE(e.failed_executions, 0) / COALESCE(e.total_executions,'0') AS success_ratio
+    COALESCE(e.total_executions,0) AS total_executions, 
+    COALESCE(e.successful_executions, 0) AS successful_executions, 
+    COALESCE(e.failed_executions, 0) AS failed_executions,
+    COALESCE(e.running_executions, 0) AS running_executions,
+    COALESCE(e.successful_executions, 0)/ NULLIF(COALESCE(e.total_executions,0),0) AS success_ratio
     FROM exec_processes AS e
     RIGHT JOIN PROCESSES AS p 
     ON e.process_id = p.process_id
@@ -155,7 +155,7 @@ CREATE VIEW process_execution_ranking AS
     SELECT
     e.execution_id,
     e.process_id,
-    p..process_name,
+    p.name,
     e.executed_at,
     e.status,
     COUNT(e.execution_id) OVER (PARTITION BY e.process_id) AS number_of_executions,
@@ -184,7 +184,7 @@ BEGIN
     WHERE e.batch_id = param_batch_id
     ORDER BY e.executed_at DESC;
 END //
-DELIMITER;
+DELIMITER ;
 
 --Insert another process in the PROCESSES table 
 DELIMITER //
@@ -208,7 +208,7 @@ BEGIN
     INSERT INTO PROCESSES(name)
     VALUES(param_process_name);
 END //
-DELIMITER;
+DELIMITER ;
 
 --Add user in USERS table stored procedure   
 DELIMITER //
@@ -217,7 +217,7 @@ BEGIN
     INSERT INTO USERS(first_name, last_name)
     VALUES (param_fn, param_ln);
 END //
-DELIMITER;
+DELIMITER ;
 
 --Edit DB name in USERS table stored procedure   
 DELIMITER //
@@ -227,7 +227,7 @@ BEGIN
     SET first_name = param_fn , last_name = param_ln
     WHERE user_id = par_id;
 END //
-DELIMITER;
+DELIMITER ;
 
 --Stored Procedure that changes the name introduced wrong of a process
 DELIMITER //
@@ -236,12 +236,12 @@ BEGIN
     UPDATE PROCESSES
     SET name = correct_name
     WHERE id = (
-        SELECT process_id
+        SELECT id
         FROM PROCESSES
         WHERE name = wrong_name
     );
 END //
-DELIMITER;
+DELIMITER ;
 
 --SQL query to eliminate a user
 DELIMITER //
@@ -254,5 +254,5 @@ BEGIN
         WHERE first_name = param_fn AND last_name = param_ln
     );
 END //
-DELIMITER;
+DELIMITER ;
 ;
