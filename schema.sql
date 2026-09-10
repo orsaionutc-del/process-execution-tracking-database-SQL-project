@@ -108,6 +108,29 @@ FROM EXECUTIONS e
 JOIN ERRORS er
     ON e.execution_id = er.execution_id;
 
+CREATE VIEW process_statistics AS
+WITH exec_processes AS (
+    SELECT
+    process_id,
+    COUNT(status) as total_executions,
+    SUM(CASE WHEN status = 'SUCCESS' THEN 1 ELSE 0 END) AS succesful_executions,
+    SUM(CASE WHEN status = 'FAILED' THEN 1 ELSE 0 END) AS failed_executions,
+    SUM(CASE WHEN status = 'RUNNING' THEN 1 ELSE 0 END) AS running_executions
+FROM EXECUTIONS
+GROUP BY process_id
+    )
+    SELECT 
+    p.name, 
+    e.process_id, 
+    COALESCE(e.total_executions,'0'), 
+    COALESCE(e.succesful_executions, 0), 
+    COALESCE(e.failed_executions, 0),
+    COALESCE(e.running_executions, 0)
+    FROM exec_processes AS e
+    RIGHT JOIN PROCESSES AS p 
+    ON e.process_id = p.process_id
+    ;
+
 ALTER TABLE EXECUTIONS
 ADD CONSTRAINT chk_status
 CHECK (status IN ('SUCCESS','FAILED','RUNNING'));
