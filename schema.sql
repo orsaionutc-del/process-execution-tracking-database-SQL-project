@@ -1,27 +1,32 @@
-    CREATE TABLE USERS (
+-- Schema Design for 8 tables
+
+    CREATE TABLE USERS (
         user_id SMALLINT AUTO_INCREMENT PRIMARY KEY,
         first_name VARCHAR(20) NOT NULL,
-        last_name VARCHAR(20) NOT NULL
+        last_name VARCHAR(20) NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE
     );
 
     CREATE TABLE PROCESSES (
         process_id INTEGER AUTO_INCREMENT  PRIMARY KEY,
-        name VARCHAR(100) UNIQUE,
-        deleted BOOLEAN
+        name VARCHAR(100) NOT NULL UNIQUE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE BATCHES (
-        batch_id INTEGER AUTO_INCREMENT  PRIMARY KEY,
-        created_at DATETIME
+        batch_id INTEGER AUTO_INCREMENT PRIMARY KEY,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE EXECUTIONS (
-        execution_id INTEGER AUTO_INCREMENT  PRIMARY KEY,
-        process_id INTEGER,
-        user_id SMALLINT,
-        batch_id INTEGER,
-        executed_at DATETIME,
-        status ENUM('SUCCESS','FAILED','RUNNING'),
+        execution_id INTEGER AUTO_INCREMENT PRIMARY KEY,
+        process_id INTEGER NOT NULL,
+        user_id SMALLINT NOT NULL,
+        batch_id INTEGER NOT NULL,
+        executed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        status ENUM('SUCCESS','FAILED','RUNNING') NOT NULL,
 
         FOREIGN KEY (process_id) REFERENCES PROCESSES(process_id),
         FOREIGN KEY (user_id) REFERENCES USERS(user_id),
@@ -29,25 +34,25 @@
     );
 
     CREATE TABLE INPUTS (
-        input_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-        batch_id INTEGER,
-        input MEDIUMBLOB,
+        input_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        batch_id INTEGER NOT NULL,
+        input MEDIUMBLOB NOT NULL,
 
         FOREIGN KEY (batch_id) REFERENCES BATCHES(batch_id)
     );
 
     CREATE TABLE OUTPUTS (
-        output_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-        execution_id INTEGER,
-        output MEDIUMBLOB,
+        output_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        execution_id INTEGER NOT NULL,
+        output MEDIUMBLOB NOT NULL,
 
         FOREIGN KEY (execution_id) REFERENCES EXECUTIONS(execution_id)
     );
 
     CREATE TABLE ERRORS (
-        error_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-        execution_id INTEGER,
-        error_msg VARCHAR(400),
+        error_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        execution_id INTEGER NOT NULL,
+        error_msg VARCHAR(400) NOT NULL,
 
         FOREIGN KEY (execution_id) REFERENCES EXECUTIONS(execution_id)
     );
@@ -55,11 +60,23 @@
 CREATE INDEX idx_executions_user
 ON EXECUTIONS(user_id);
 
+CREATE INDEX idx_batchid
+ON EXECUTIONS(batch_id);
+
 CREATE INDEX idx_executions_process
 ON EXECUTIONS(process_id);
 
 CREATE INDEX idx_executions_date
 ON EXECUTIONS(executed_at);
+
+CREATE INDEX idx_input_bid
+ON INPUTS(batch_id);
+
+CREATE INDEX idx_execution_id
+ON OUTPUTS(execution_id);
+
+CREATE INDEX idx_error_exec
+ON ERRORS(execution_id);
 
 CREATE VIEW execution_summary AS
 SELECT
@@ -151,7 +168,7 @@ BEGIN
     UPDATE PROCESSES
     SET name = correct_name
     WHERE id = (
-        SELECT id
+        SELECT process_id
         FROM PROCESSES
         WHERE name = wrong_name
     );
