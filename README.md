@@ -6,7 +6,7 @@ By Orsa Ionut Cristian
 
 The purpose of this database is to have an audit trail of the scripts and processes that are executed in an accounting enviroment.
 
-* Which people, places, things, etc. are included in the scope of your database?
+* Which people, places, things, etc. are included in the scope of this database?
 
 - Accounting department users that are using the scripts
 - The input data from the ERP
@@ -29,47 +29,50 @@ This database is needed only for audit trail and error checking, the user should
 ## Representation
 
     USERS {
-        tiny int user_id PK
-        string first_name VARCHAR(50)
-        string last_name VARCHAR(50)
+        user_id SMALLINT AUTO_INCREMENT PRIMARY KEY,
+        first_name VARCHAR(20) NOT NULL,
+        last_name VARCHAR(20) NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE
     }
 
     PROCESSES {
-        int process_id PK
-        string name VARCHAR(100)
-        bool deleted
+        process_id INTEGER AUTO_INCREMENT  PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     }
 
     EXECUTIONS {
-        int execution_id PK
-        int process_id FK
-        tiny int user_id FK
-        int batch_id FK
-        datetime executed_at
-        VARCHAR(50) enum('SUCCESS','FAILED','RUNNING')
+        execution_id INTEGER AUTO_INCREMENT PRIMARY KEY,
+        process_id INTEGER NOT NULL,
+        user_id SMALLINT NOT NULL,
+        batch_id INTEGER NOT NULL,
+        executed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        status ENUM('SUCCESS','FAILED','RUNNING') NOT NULL
     }
 
     BATCHES {
-        int batch_id PK
-        datetime created_at
+        batch_id INTEGER AUTO_INCREMENT PRIMARY KEY,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     }
 
     INPUTS {
-        int input_id PK
-        int batch_id FK
-        blob input
+        input_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        batch_id INTEGER NOT NULL,
+        input MEDIUMBLOB NOT NULL,
     }
 
     OUTPUTS {
-        int output_id PK
-        int execution_id FK
-        blob output
+        output_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        execution_id INTEGER NOT NULL,
+        output MEDIUMBLOB NOT NULL,
     }
 
     ERRORS {
-        int error_id PK
-        int execution_id FK
-        string error_msg VARCHAR(400)
+        error_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        execution_id INTEGER NOT NULL,
+        error_msg VARCHAR(400) NOT NULL,
     }
 
 ### Entities
@@ -117,10 +120,15 @@ VARCHAR limits were chosen based on expected data sizes to avoid unnecessary sto
 Primary keys are defined on all tables to ensure unique identification of records and efficient joins between entities.
 Foreign key relationships are used to maintain referential integrity between users, processes, executions, batches, outputs, inputs, and errors.
 The database uses integer-based identifiers instead of storing repeated text values across multiple tables. This reduces storage requirements and simplifies joins.
-Two views were created for frequently used reporting purposes:
+Six views were created for frequently used reporting purposes:
 
-A view that combines process executions, batches, and errors to simplify troubleshooting and error analysis.
-A view that combines execution information with input and output files to simplify audit trail reporting.
+execution_summary -> combines process executions, batches, and errors to simplify troubleshooting and error analysis.
+failed_executions -> shows all the failed executions, this is where you check what process failed for each process so we know what we should improve.
+execution_errors -> shows all the executions and the error messages
+process_statistics -> statistics regarding total processes and their success so we know what we should improve
+user_executions_statistics -> shows number of executions/user
+process_execution_ranking -> execution order + number of executions to build analysis for period of times and to display what are the most used processes
+
 
 Indexes may be created on frequently searched columns such as:
 
