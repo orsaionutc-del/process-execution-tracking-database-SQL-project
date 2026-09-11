@@ -33,7 +33,7 @@ erDiagram
         SMALLINT user_id FK "NOT NULL"
         INTEGER batch_id FK "NOT NULL"
         DATETIME executed_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
-        ENUM status "s4 NOT NULL"
+        ENUM status "NOT NULL"
     }
 
     BATCHES ||--|| INPUTS : has
