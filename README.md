@@ -25,55 +25,64 @@ The purpose of this database is to have an audit trail of the scripts and proces
 
 When using a script that automates an ERP process the user should be able to have an audit trail.
 This database is needed only for audit trail and error checking, the user should not use this data to check if the financial data from Accounting is correct. To check if the data is correct the user should look directly into the ERP.
+Also, this database keeps track of process execution status. When a process is started a new batch id is inserted in the table BATCHES, the same batch id is inserted in table INPUTS along with the input file, and in the table EXECUTION our stored procedure inserts the specific process id, the id of the user that executes the script, the same batch id, and the status of the execution (RUNNING, SUCCESS or FAILED). After this, when the script is finished we have another stored procedures that update the status of the process and saves the outputs.
 
 ## Representation
 
-    USERS {
-        user_id SMALLINT AUTO_INCREMENT PRIMARY KEY,
-        first_name VARCHAR(20) NOT NULL,
-        last_name VARCHAR(20) NOT NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE
-    }
+    USERS ||--o{ EXECUTIONS : runs
+    USERS {
+        SMALLINT user_id PK "AUTO_INCREMENT"
+        VARCHAR(20) first_name "NOT NULL"
+        VARCHAR(20) last_name "NOT NULL"
+        DATETIME created_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        BOOLEAN deleted "NOT NULL DEFAULT FALSE"
+    }
 
-    PROCESSES {
-        process_id INTEGER AUTO_INCREMENT  PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    }
+    PROCESSES ||--o{ EXECUTIONS : executed
+    PROCESSES {
+        INTEGER process_id PK "AUTO_INCREMENT"
+        VARCHAR(100) name "NOT NULL UNIQUE"
+        BOOLEAN deleted "NOT NULL DEFAULT FALSE"
+        DATETIME created_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    }
 
-    EXECUTIONS {
-        execution_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-        process_id INTEGER NOT NULL,
-        user_id SMALLINT NOT NULL,
-        batch_id INTEGER NOT NULL,
-        executed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        status ENUM('SUCCESS','FAILED','RUNNING') NOT NULL
-    }
+    BATCHES ||--o{ EXECUTIONS : belongs_to
+    EXECUTIONS {
+        INTEGER execution_id PK "AUTO_INCREMENT"
+        INTEGER process_id FK "NOT NULL"
+        SMALLINT user_id FK "NOT NULL"
+        INTEGER batch_id FK "NOT NULL"
+        DATETIME executed_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        ENUM status "s4 NOT NULL"
+    }
 
-    BATCHES {
-        batch_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    }
 
-    INPUTS {
-        input_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-        batch_id INTEGER NOT NULL,
-        input MEDIUMBLOB NOT NULL,
-    }
+    BATCHES {
+        INTEGER batch_id PK "AUTO_INCREMENT"
+        DATETIME created_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    }
 
-    OUTPUTS {
-        output_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-        execution_id INTEGER NOT NULL,
-        output MEDIUMBLOB NOT NULL,
-    }
+    BATCHES ||--|| INPUTS : has
+    INPUTS {
+        INTEGER input_id PK "AUTO_INCREMENT NOT NULL"
+        INTEGER batch_id FK "NOT NULL"
+        MEDIUMBLOB input "NOT NULL"
+    }
 
-    ERRORS {
-        error_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-        execution_id INTEGER NOT NULL,
-        error_msg VARCHAR(400) NOT NULL,
-    }
+    EXECUTIONS ||--|| OUTPUTS : generates
+    OUTPUTS {
+        INTEGER output_id PK "AUTO_INCREMENT NOT NULL"
+        INTEGER execution_id FK "NOT NULL"
+        MEDIUMBLOB output "NOT NULL"
+    }
+
+    EXECUTIONS ||--o{ ERRORS : generates
+    ERRORS {
+        INTEGER error_id PK "AUTO_INCREMENT NOT NULL"
+        INTEGER execution_id FK "NOT NULL"
+        VARCHAR(400) error_msg "NOT NULL"
+
+    }
 
 ### Entities
 
@@ -92,7 +101,7 @@ The database uses integers for identifiers and foreign keys, VARCHAR fields for 
 * Why did I choose the constraints I did?
 
 Primary key constraints are used to uniquely identify records in every table.
-Foreign key constraints are used to enforce relationships between users, processes, executions, batches and errors.
+Foreign key constraints are used to enforce relationships between users, processes, executions, batches, inputs, outputs and errors.
 The deleted attribute in the Processes table is represented as a Boolean value so that processes can be soft-deleted without losing historical execution data.
 VARCHAR limits were chosen based on expected data sizes to avoid unnecessary storage usage while still providing sufficient flexibility.
 
@@ -132,12 +141,21 @@ process_execution_ranking -> execution order + number of executions to build ana
 
 Indexes may be created on frequently searched columns such as:
 
-execution_id
-process_id
-user_id
-batch_id
+TABLE EXECUTIONS -> user_id
 
-to improve query performance when filtering or joining records.
+TABLE EXECUTIONS -> batch_id
+
+TABLE EXECUTIONS -> process_id
+
+TABLE EXECUTIONS -> executed_at
+
+TABLE INPUTS -> batch_id
+
+TABLE OUTPUTS -> execution_id
+
+TABLE ERRORS -> execution_id
+
+The indexes were added to improve query performance when filtering or joining records.
 
 ## Limitations
 
