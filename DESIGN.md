@@ -3,11 +3,7 @@
 - By Orsa Ionut Cristian
 - Made with MermaidJs
 
----
-config:
-layout: elk
----
-erDiagram
+## ErDiagram
 
     
     USERS {
