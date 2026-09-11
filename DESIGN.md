@@ -8,6 +8,7 @@ config:
   layout: elk
 ---
 erDiagram
+
     USERS ||--o{ EXECUTIONS : runs
     USERS {
         SMALLINT user_id PK "AUTO_INCREMENT"
@@ -66,5 +67,3 @@ erDiagram
 
 
 ![DatabaseDiagram](Diagram.jpg)
-The design assumes that each execution generates a single output file. If future requirements require multiple output files per execution, the schema would need to be extended.
-The database is intended for a small team and is not optimized for large-scale enterprise workloads involving millions of executions or file uploads.
