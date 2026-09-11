@@ -4,9 +4,9 @@ By Orsa Ionut Cristian
 
 ## Scope
 
-The purpose of this database is to have an audit trail of the scripts and processes that are executed in an accounting enviroment.
+The purpose of this database is to have an audit trail of the scripts and processes that are executed in an accounting environment.
 
-* Which people, places, things, etc. are included in the scope of this database?
+### Which people, places, things, etc. are included in the scope of this database?
 
 - Accounting department users that are using the scripts
 - The input data from the ERP
@@ -14,7 +14,7 @@ The purpose of this database is to have an audit trail of the scripts and proces
 - The name and details of the scripts that were used
 - An error/ process status table
 
-* Which people, places, things, etc. are *outside* the scope of the database?
+### Which people, places, things, etc. are *outside* the scope of the database?
 
 - Financial data stored inside the ERP
 - Validation of accounting data correctness
@@ -56,7 +56,7 @@ When a process is started a new batch id is inserted in the table BATCHES, the s
         SMALLINT user_id FK "NOT NULL"
         INTEGER batch_id FK "NOT NULL"
         DATETIME executed_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
-        ENUM status "s4 NOT NULL"
+        ENUM status "NOT NULL"
     }
 
 
