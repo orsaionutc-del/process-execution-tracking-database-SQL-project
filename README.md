@@ -127,23 +127,23 @@ VARCHAR limits were chosen based on expected data sizes to avoid unnecessary sto
 
 ## Optimizations
 
-* Indexes and views:
+* Primary and foreign keys:
 
 Primary keys are defined on all tables to ensure unique identification of records and efficient joins between entities.  
 Foreign key relationships are used to maintain referential integrity between users, processes, executions, batches, outputs, inputs, and errors.  
 The database uses integer-based identifiers instead of storing repeated text values across multiple tables. This reduces storage requirements and simplifies joins.  
 
-Six views were created for frequently used reporting purposes:
+* Six views were created for frequently used reporting purposes:
 
-execution_summary -> combines process executions, batches, and errors to simplify troubleshooting and error analysis.  
-failed_executions -> shows all the failed executions, this is where you check what process failed for each process so we know what we should improve.  
-execution_errors -> shows all the executions and the error messages 
-process_statistics -> statistics regarding total processes and their success so we know what we should improve 
-user_executions_statistics -> shows number of executions/user 
-process_execution_ranking -> execution order + number of executions to build analysis for period of times and to display what are the most used processes 
+- execution_summary -> combines process executions, batches, and errors to simplify troubleshooting and error analysis.  
+- failed_executions -> shows all the failed executions, this is where you check what process failed for each process so we know what we should improve.  
+- execution_errors -> shows all the executions and the error messages 
+- process_statistics -> statistics regarding total processes and their success so we know what we should improve 
+- user_executions_statistics -> shows number of executions/user 
+- process_execution_ranking -> execution order + number of executions to build analysis for period of times and to display what are the most used processes 
 
 
-Indexes may be created on frequently searched columns such as:
+* Indexes may be created on frequently searched columns such as:
 
 TABLE EXECUTIONS -> user_id
 
