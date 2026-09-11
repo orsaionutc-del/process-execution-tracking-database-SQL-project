@@ -310,10 +310,15 @@ BEGIN
 END //
 DELIMITER ;
 
---Exexution success
+--Execution success
 DELIMITER //
 CREATE PROCEDURE CompleteExecutionSuccess(IN param_execution_id INT, IN param_output MEDIUMBLOB)
     BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+    ROLLBACK;
+    RESIGNAL;
+    END;
     IF NOT EXISTS (
     SELECT 1 FROM EXECUTIONS 
     WHERE execution_id = param_execution_id AND status = 'RUNNING'
@@ -322,18 +327,25 @@ CREATE PROCEDURE CompleteExecutionSuccess(IN param_execution_id INT, IN param_ou
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'This execution does not exist or is not currently running.';
     END IF;
+    START TRANSACTION;
     UPDATE EXECUTIONS
     SET status = 'SUCCESS'
     WHERE execution_id = param_execution_id;
     INSERT INTO OUTPUTS(execution_id, output)
     VALUES (param_execution_id, param_output);
+    COMMIT;
 END //
 DELIMITER ;
 
---Failed execution
+-- Failed execution
 DELIMITER //
 CREATE PROCEDURE CompleteExecutionFailure (IN param_execution_id INT, IN param_error_msg VARCHAR(400))
 BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+    ROLLBACK;
+    RESIGNAL;
+    END;
     IF NOT EXISTS (
     SELECT 1 FROM EXECUTIONS 
     WHERE execution_id = param_execution_id AND status = 'RUNNING'
@@ -342,10 +354,12 @@ BEGIN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'This execution does not exist or is not currently running.';
     END IF;
+START TRANSACTION;
     UPDATE EXECUTIONS
     SET status = 'FAILED'
     WHERE execution_id = param_execution_id;
     INSERT INTO ERRORS(execution_id, error_msg)
     VALUES (param_execution_id, param_error_msg);
+COMMIT;
 END //
 DELIMITER ;
