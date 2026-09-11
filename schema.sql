@@ -1,4 +1,4 @@
--- Schema Design for 8 tables
+-- Schema Design for 7 tables
 
     CREATE TABLE USERS (
         user_id SMALLINT AUTO_INCREMENT PRIMARY KEY,
