@@ -25,7 +25,7 @@ The purpose of this database is to have an audit trail of the scripts and proces
 
 When using a script that automates an ERP process the user should be able to have an audit trail.
 This database is needed only for audit trail and error checking, the user should not use this data to check if the financial data from Accounting is correct. To check if the data is correct the user should look directly into the ERP.
-Also, this database keeps track of process execution status. When a process is started a new batch id is inserted in the table BATCHES, the same batch id is inserted in table INPUTS along with the input file, and in the table EXECUTION our stored procedure inserts the specific process id, the id of the user that executes the script, the same batch id, and the status of the execution (RUNNING, SUCCESS or FAILED). After this, when the script is finished we have another stored procedures that update the status of the process and saves the outputs.
+Also, this database keeps track of process execution status. When a process is started a new batch id is inserted in the table BATCHES, the same batch id is inserted in table INPUTS along with the input file, and in the table EXECUTION our stored procedure inserts the specific process id, the id of the user that executes the script, the same batch id, and the status of the execution (RUNNING, SUCCESS or FAILED). After this, when the script is finished we have two other stored procedures that update the status of the process and save the outputs.
 
 ## Representation
 
