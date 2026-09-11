@@ -1,7 +1,7 @@
 # Diagram design Document
 
--By Orsa Ionut Cristian
--Made with MermaidJs
+- By Orsa Ionut Cristian
+- Made with MermaidJs
 
 ---
 config:
@@ -9,7 +9,7 @@ layout: elk
 ---
 erDiagram
 
-    USERS ||--o{ EXECUTIONS : runs
+    
     USERS {
         SMALLINT user_id PK "AUTO_INCREMENT"
         VARCHAR(20) first_name "NOT NULL"
@@ -18,7 +18,6 @@ erDiagram
         BOOLEAN deleted "NOT NULL DEFAULT FALSE"
     }
 
-    PROCESSES ||--o{ EXECUTIONS : executed
     PROCESSES {
         INTEGER process_id PK "AUTO_INCREMENT"
         VARCHAR(100) name "NOT NULL UNIQUE"
@@ -26,7 +25,6 @@ erDiagram
         DATETIME created_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
     }
 
-    BATCHES ||--o{ EXECUTIONS : belongs_to
     EXECUTIONS {
         INTEGER execution_id PK "AUTO_INCREMENT"
         INTEGER process_id FK "NOT NULL"
@@ -36,13 +34,11 @@ erDiagram
         ENUM status "NOT NULL"
     }
 
-    BATCHES ||--|| INPUTS : has
     BATCHES {
         INTEGER batch_id PK "AUTO_INCREMENT"
         DATETIME created_at "NOT NULL DEFAULT CURRENT_TIMESTAMP"
     }
 
-    EXECUTIONS ||--|| OUTPUTS : generates
     INPUTS {
         INTEGER input_id PK "AUTO_INCREMENT NOT NULL"
         INTEGER batch_id FK "NOT NULL"
@@ -55,7 +51,6 @@ erDiagram
         MEDIUMBLOB output "NOT NULL"
     }
 
-    EXECUTIONS ||--o{ ERRORS : generates
     ERRORS {
         INTEGER error_id PK "AUTO_INCREMENT NOT NULL"
         INTEGER execution_id FK "NOT NULL"
@@ -63,6 +58,12 @@ erDiagram
 
     }
 
+    USERS ||--o{ EXECUTIONS : runs
+    EXECUTIONS ||--o{ ERRORS : generates
+    EXECUTIONS ||--|| OUTPUTS : generates
+    BATCHES ||--|| INPUTS : has
+    BATCHES ||--o{ EXECUTIONS : belongs_to
+    PROCESSES ||--o{ EXECUTIONS : executed
 
 
 
