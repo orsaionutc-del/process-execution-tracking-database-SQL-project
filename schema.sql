@@ -35,7 +35,7 @@
 
     CREATE TABLE INPUTS (
         input_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-        batch_id INTEGER NOT NULL,
+        batch_id INTEGER NOT NULL UNIQUE,
         input MEDIUMBLOB NOT NULL,
 
         FOREIGN KEY (batch_id) REFERENCES BATCHES(batch_id)
@@ -43,7 +43,7 @@
 
     CREATE TABLE OUTPUTS (
         output_id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-        execution_id INTEGER NOT NULL,
+        execution_id INTEGER NOT NULL UNIQUE,
         output MEDIUMBLOB NOT NULL,
 
         FOREIGN KEY (execution_id) REFERENCES EXECUTIONS(execution_id)
