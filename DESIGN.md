@@ -1,11 +1,11 @@
 # Diagram design Document
 
-By Orsa Ionut Cristian
-Made with MermaidJs
+-By Orsa Ionut Cristian
+-Made with MermaidJs
 
 ---
 config:
-  layout: elk
+layout: elk
 ---
 erDiagram
 
