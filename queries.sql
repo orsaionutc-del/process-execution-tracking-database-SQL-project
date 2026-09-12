@@ -267,6 +267,51 @@ SELECT
 FROM daily_movement
 ORDER BY process_id, day_num;
 
+-- Per process average execution time / SUCCESFUL batch compared with the actual execution time of one batch + alert column for e difference bigger than for batches with 15% more execution time than the average
+
+WITH succes_filter AS (
+  SELECT
+    process_id,
+    batch_id,
+    executed_at,
+    CASE
+    WHEN status = 'SUCCES' THEN '0'
+    ELSE '1' END filter
+  FROM EXECUTIONS
+  ),
+  
+avg_batch AS (
+  SELECT
+    process_id,
+    batch_id,
+    AVG(TIME_TO_SECONDS(DATEDIFF(MAX(executed_at)-MIN(executed_at)))) AS batch_exec_time
+  FROM succes_filter
+  WHERE SUM(filter) = 0
+  GROUP BY batch_id, process_id
+  ),
+
+avg_process AS (
+  SELECT 
+    process_id,
+    AVG(batch_exec_time) AS avg_process_time
+  FROM avg_batch
+  GROUP BY process_id
+  )
+
+SELECT
+  p.process_id, 
+  pr.name,
+  b.batch_id,
+  CONCAT(ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2),'%') AS compared_to average,
+  CASE
+  WHEN ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2) < 85 THEN 'ALERT'
+  ELSE 'OK' END AS alert_column
+FROM avg_batch AS b
+JOIN avg_process AS p
+ON b.process_id = p.process_id
+JOIN PROCESSES AS pr
+ON p.process_id = pr.process_id
+
   
 
 
