@@ -70,7 +70,7 @@ SELECT user_id,
   batch_count, 
   DENSE_RANK() OVER (ORDER BY batch_count DESC) AS rank
 FROM b_count
-ORDER BY  DENSE_RANK() OVER (ORDER_BY batch_count DESC);
+ORDER BY  DENSE_RANK() OVER (ORDER BY batch_count DESC);
 
 -- What is the most common error for each process that was not already deleted from DB ?
 
@@ -136,7 +136,7 @@ SELECT d.name,
   CONCAT(ROUND(d.number_of_apparitions/t.total_errors * 100 , 2), '%') AS percentage_of_total_errors
 FROM diff_error_for_processes AS d
 JOIN total_errors_per_process AS t
-  ON d.name = t.name
+  ON d.name = t.name;
 
 -- Existent processes with no executions
 
@@ -147,7 +147,7 @@ SELECT p.process_id,
 FROM PROCESSES AS p
 LEFT JOIN EXECUTIONS AS e
 ON p.process_id = e.process_id
-WHERE e.process_id IS NULL
+WHERE e.process_id IS NULL;
 
 -- batches where the failure rate exceeded 30% for three consecutive batches of the same process
 
@@ -184,9 +184,7 @@ percent AS (
 
 percentage AS (
   SELECT *,
-    LAG(last_process_status) OVER (PARTITION BY process_id ORDER BY executed_at)
-  
-  AS sec_last_proc_status
+    LAG(last_process_status) OVER (PARTITION BY process_id ORDER BY executed_at) AS sec_last_proc_status
   FROM percent
   ),
   
@@ -275,7 +273,7 @@ WITH succes_filter AS (
     batch_id,
     executed_at,
     CASE
-    WHEN status = 'SUCCES' THEN '0'
+    WHEN status = 'SUCCESS' THEN '0'
     ELSE '1' END filter
   FROM EXECUTIONS
   ),
@@ -284,10 +282,10 @@ avg_batch AS (
   SELECT
     process_id,
     batch_id,
-    AVG(TIME_TO_SECONDS(DATEDIFF(MAX(executed_at)-MIN(executed_at)))) AS batch_exec_time
+    AVG(TIMESTAMPDIFF(SECOND,MIN(executed_at),MAX(executed_at))) AS batch_exec_time
   FROM succes_filter
-  WHERE SUM(filter) = 0
   GROUP BY batch_id, process_id
+  WHERE SUM(filter) = 0
   ),
 
 avg_process AS (
@@ -312,7 +310,38 @@ ON b.process_id = p.process_id
 JOIN PROCESSES AS pr
 ON p.process_id = pr.process_id
 
+-- process reliability score + kpi's
+
+WITH process_kpi AS (
+    SELECT
+        p.process_id,
+        p.name,
+        COUNT(DISTINCT e.batch_id) AS total_batches,
+        COUNT(CASE WHEN e.status = 'FAILED' THEN 1 END) AS failed_executions,
+        COUNT(e.execution_id) AS total_executions,
+        MAX(e.executed_at) AS last_execution
+    FROM PROCESSES AS p
+    LEFT JOIN EXECUTIONS AS e
+        ON p.process_id = e.process_id
+    WHERE p.deleted = FALSE
+    GROUP BY p.process_id, p.name
+)
   
+SELECT
+    process_id,
+    name,
+    total_batches,
+    total_executions,
+    failed_executions,
+    ROUND(failed_executions / NULLIF(total_executions, 0) * 100,2) AS failure_rate,
+    last_execution,
+    CASE
+    WHEN failed_executions / NULLIF(total_executions, 0) > 0.30 THEN 'CRITICAL'
+    WHEN failed_executions / NULLIF(total_executions, 0) > 0.10 THEN 'WARNING'
+    ELSE 'HEALTHY'
+    END AS process_status
+FROM process_kpi
+ORDER BY failure_rate DESC;
 
 
 
