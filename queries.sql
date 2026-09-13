@@ -2,7 +2,7 @@
 
 WITH error_count AS (
   SELECT p.name, 
-    COUNT(p.process_id) AS error_num
+    COUNT(e.execution_id) AS error_num
   FROM EXECUTIONS AS e
   JOIN PROCESSES AS p
     ON p.process_id = e.process_id
@@ -13,15 +13,15 @@ WITH error_count AS (
 ranking AS (
   SELECT name, 
     error_num, 
-    ROW_NUMBER() OVER ( ORDER BY error_num DESC ) AS rank
+    ROW_NUMBER() OVER ( ORDER BY error_num DESC ) AS ranks
   FROM error_count 
   )
 
 SELECT name, 
   error_num
 FROM ranking
-WHERE rank < 4
-ORDER BY rank;
+WHERE ranks < 4
+ORDER BY ranks;
 
 -- Failure rate per process from the last two weeks to check what process should be improved due to recent changes
 
@@ -46,7 +46,7 @@ total_count AS (
   )
 
 SELECT e.name, 
-  ROUND(e.error_num/t.total_proc*100,2) AS fail_percentage
+  CONCAT(ROUND(e.error_num/t.total_proc*100,2),' %') AS fail_percentage
 FROM error_count AS e
 JOIN total_count AS t
   ON e.name = t.name
@@ -57,7 +57,7 @@ ORDER BY ROUND(e.error_num/t.total_proc*100,2) DESC;
 WITH b_count AS (
   SELECT 
     COALESCE(u.user_id,'Unknown') AS user_id, 
-    COALESCE(CONCAT(u.first_name,u.last_name),'Unknown') AS full_name, 
+    COALESCE(CONCAT(u.first_name,' ',u.last_name),'Unknown') AS full_name, 
   COUNT(DISTINCT(e.batch_id)) AS batch_count
   FROM EXECUTIONS AS e
   LEFT JOIN USERS AS u 
@@ -68,7 +68,7 @@ WITH b_count AS (
 SELECT user_id, 
   full_name, 
   batch_count, 
-  DENSE_RANK() OVER (ORDER BY batch_count DESC) AS rank
+  DENSE_RANK() OVER (ORDER BY batch_count DESC) AS ranking
 FROM b_count
 ORDER BY  DENSE_RANK() OVER (ORDER BY batch_count DESC);
 
@@ -93,7 +93,7 @@ SELECT
   name,
   error_msg,
   number_of_apparitions,
-  DENSE_RANK() OVER (PARTITION BY name ORDER BY number_of_apparitions DESC) AS rank
+  DENSE_RANK() OVER (PARTITION BY name ORDER BY number_of_apparitions DESC) AS ranking
 FROM diff_error_for_processes
 )
 
@@ -102,7 +102,7 @@ SELECT
   error_msg, 
   number_of_apparitions
 FROM ranking
-WHERE rank <= 1;
+WHERE ranking <= 1;
 
 -- percentage distribution of each error type per process
 
@@ -190,14 +190,16 @@ percentage AS (
   
 problems AS (
   SELECT process_id,
+    batch_id,
     CASE
-    WHEN fail_percentage > 30 AND last_process_status > 30 AND sec_last_process_status > 30 THEN TRUE
+    WHEN fail_percentage > 30 AND last_process_status > 30 AND sec_last_proc_status > 30 THEN TRUE
     ELSE FALSE END AS consecutive_fails,
     executed_at
   FROM percentage
 )
 
 SELECT pr.process_id,
+  p.batch_id,
   pr.name,
   pr.deleted,
   p.executed_at
@@ -273,8 +275,8 @@ WITH succes_filter AS (
     batch_id,
     executed_at,
     CASE
-    WHEN status = 'SUCCESS' THEN '0'
-    ELSE '1' END filter
+    WHEN status = 'SUCCESS' THEN 0
+    ELSE 1 END filter
   FROM EXECUTIONS
   ),
   
@@ -282,10 +284,10 @@ avg_batch AS (
   SELECT
     process_id,
     batch_id,
-    AVG(TIMESTAMPDIFF(SECOND,MIN(executed_at),MAX(executed_at))) AS batch_exec_time
+    TIMESTAMPDIFF(SECOND,MIN(executed_at),MAX(executed_at)) AS batch_exec_time
   FROM succes_filter
   GROUP BY batch_id, process_id
-  WHERE SUM(filter) = 0
+  HAVING SUM(filter) = 0
   ),
 
 avg_process AS (
@@ -300,7 +302,7 @@ SELECT
   p.process_id, 
   pr.name,
   b.batch_id,
-  CONCAT(ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2),'%') AS compared_to average,
+  CONCAT(ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2),'%') AS compared_to_average,
   CASE
   WHEN ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2) < 85 THEN 'ALERT'
   ELSE 'OK' END AS alert_column
@@ -308,7 +310,7 @@ FROM avg_batch AS b
 JOIN avg_process AS p
 ON b.process_id = p.process_id
 JOIN PROCESSES AS pr
-ON p.process_id = pr.process_id
+ON p.process_id = pr.process_id;
 
 -- process reliability score + kpi's
 
