@@ -577,3 +577,119 @@ INSERT INTO OUTPUTS(execution_id, output) VALUES (143, 'output_file_143.xlsx');
 
 -- Process with no executions (for LEFT JOIN query testing)
 INSERT INTO PROCESSES(process_id, name) VALUES (6, 'Lease Accounting Script');
+
+-- RETRY SCENARIOS - multiple executions per batch
+
+-- Batch 294: process 3, 3 executions
+INSERT INTO BATCHES(batch_id) VALUES (294);
+INSERT INTO INPUTS(batch_id, input) VALUES (294, 'input_file_294.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (294, 3, 2, 294, 'FAILED', '2026-08-06 13:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (294, 'Currency conversion rate not found for USD/RON');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (295, 3, 2, 294, 'FAILED', '2026-08-06 13:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (295, 'ERP connection timeout after 30 seconds');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (296, 3, 2, 294, 'SUCCESS', '2026-08-06 13:30:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (296, 'output_file_296.xlsx');
+
+-- Batch 295: process 3, 2 executions
+INSERT INTO BATCHES(batch_id) VALUES (295);
+INSERT INTO INPUTS(batch_id, input) VALUES (295, 'input_file_295.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (297, 3, 1, 295, 'FAILED', '2026-08-05 11:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (297, 'File is empty or contains no valid data');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (298, 3, 1, 295, 'FAILED', '2026-08-05 11:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (298, 'Row count mismatch between input and ERP confirmation');
+
+-- Batch 296: process 5, 3 executions
+INSERT INTO BATCHES(batch_id) VALUES (296);
+INSERT INTO INPUTS(batch_id, input) VALUES (296, 'input_file_296.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (299, 5, 3, 296, 'FAILED', '2026-06-01 13:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (299, 'Row count mismatch between input and ERP confirmation');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (300, 5, 3, 296, 'FAILED', '2026-06-01 13:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (300, 'Duplicate transaction detected for vendor ID 1023');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (301, 5, 3, 296, 'SUCCESS', '2026-06-01 13:30:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (301, 'output_file_301.xlsx');
+
+-- Batch 297: process 1, 2 executions
+INSERT INTO BATCHES(batch_id) VALUES (297);
+INSERT INTO INPUTS(batch_id, input) VALUES (297, 'input_file_297.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (302, 1, 2, 297, 'FAILED', '2026-09-08 09:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (302, 'File format not supported. Expected .xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (303, 1, 2, 297, 'SUCCESS', '2026-09-08 09:15:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (303, 'output_file_303.xlsx');
+
+-- Batch 298: process 4, 3 executions
+INSERT INTO BATCHES(batch_id) VALUES (298);
+INSERT INTO INPUTS(batch_id, input) VALUES (298, 'input_file_298.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (304, 4, 4, 298, 'FAILED', '2026-05-17 14:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (304, 'Invalid GL account mapping found in row 45');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (305, 4, 4, 298, 'FAILED', '2026-05-17 14:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (305, 'Currency conversion rate not found for USD/RON');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (306, 4, 4, 298, 'FAILED', '2026-05-17 14:30:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (306, 'Invalid date format in column executed_at');
+
+-- Batch 299: process 3, 4 executions
+INSERT INTO BATCHES(batch_id) VALUES (299);
+INSERT INTO INPUTS(batch_id, input) VALUES (299, 'input_file_299.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (307, 3, 5, 299, 'FAILED', '2026-06-21 13:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (307, 'ERP connection timeout after 30 seconds');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (308, 3, 5, 299, 'FAILED', '2026-06-21 13:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (308, 'Currency conversion rate not found for USD/RON');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (309, 3, 5, 299, 'FAILED', '2026-06-21 13:30:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (309, 'Invalid GL account mapping found in row 45');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (310, 3, 5, 299, 'SUCCESS', '2026-06-21 13:45:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (310, 'output_file_310.xlsx');
+
+-- Batch 300: process 2, 2 executions
+INSERT INTO BATCHES(batch_id) VALUES (300);
+INSERT INTO INPUTS(batch_id, input) VALUES (300, 'input_file_300.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (311, 2, 3, 300, 'FAILED', '2026-07-12 15:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (311, 'Currency conversion rate not found for USD/RON');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (312, 2, 3, 300, 'SUCCESS', '2026-07-12 15:15:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (312, 'output_file_312.xlsx');
+
+-- Batch 301: process 5, 3 executions
+INSERT INTO BATCHES(batch_id) VALUES (301);
+INSERT INTO INPUTS(batch_id, input) VALUES (301, 'input_file_301.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (313, 5, 1, 301, 'FAILED', '2026-08-20 11:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (313, 'Missing mandatory field: cost_center');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (314, 5, 1, 301, 'FAILED', '2026-08-20 11:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (314, 'File is empty or contains no valid data');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (315, 5, 1, 301, 'FAILED', '2026-08-20 11:30:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (315, 'Row count mismatch between input and ERP confirmation');
+
+-- Batch 302: process 1, 2 executions
+INSERT INTO BATCHES(batch_id) VALUES (302);
+INSERT INTO INPUTS(batch_id, input) VALUES (302, 'input_file_302.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (316, 1, 2, 302, 'FAILED', '2026-09-03 14:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (316, 'File format not supported. Expected .xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (317, 1, 2, 302, 'SUCCESS', '2026-09-03 14:15:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (317, 'output_file_317.xlsx');
+
+-- Batch 303: process 3, 3 executions
+INSERT INTO BATCHES(batch_id) VALUES (303);
+INSERT INTO INPUTS(batch_id, input) VALUES (303, 'input_file_303.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (318, 3, 3, 303, 'FAILED', '2026-08-17 14:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (318, 'Missing mandatory field: cost_center');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (319, 3, 3, 303, 'FAILED', '2026-08-17 14:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (319, 'Currency conversion rate not found for USD/RON');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (320, 3, 3, 303, 'SUCCESS', '2026-08-17 14:30:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (320, 'output_file_320.xlsx');
+
+-- Batch 304: process 4, 2 executions
+INSERT INTO BATCHES(batch_id) VALUES (304);
+INSERT INTO INPUTS(batch_id, input) VALUES (304, 'input_file_304.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (321, 4, 1, 304, 'FAILED', '2026-05-13 12:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (321, 'ERP connection timeout after 30 seconds');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (322, 4, 1, 304, 'FAILED', '2026-05-13 12:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (322, 'File is empty or contains no valid data');
+
+-- Batch 305: process 5, 4 executions
+INSERT INTO BATCHES(batch_id) VALUES (305);
+INSERT INTO INPUTS(batch_id, input) VALUES (305, 'input_file_305.xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (323, 5, 4, 305, 'FAILED', '2026-08-02 15:00:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (323, 'File is empty or contains no valid data');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (324, 5, 4, 305, 'FAILED', '2026-08-02 15:15:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (324, 'File format not supported. Expected .xlsx');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (325, 5, 4, 305, 'FAILED', '2026-08-02 15:30:00');
+INSERT INTO ERRORS(execution_id, error_msg) VALUES (325, 'Invalid GL account mapping found in row 45');
+INSERT INTO EXECUTIONS(execution_id, process_id, user_id, batch_id, status, executed_at) VALUES (326, 5, 4, 305, 'SUCCESS', '2026-08-02 15:45:00');
+INSERT INTO OUTPUTS(execution_id, output) VALUES (326, 'output_file_326.xlsx');
