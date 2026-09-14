@@ -1,4 +1,5 @@
--- SQL query that returns top 3 processes with the most failed executions and the number of failed executions. This helps the team to target what needs to be improved
+-- Identifies the top 3 active processes with the highest number of failed executions
+-- Business use: Helps the team prioritize processes that require improvement
 
 WITH error_count AS (
   SELECT p.name, 
@@ -23,7 +24,8 @@ FROM ranking
 WHERE ranks < 4
 ORDER BY ranks;
 
--- Failure rate per process from the last two weeks to check what process should be improved due to recent changes
+-- Calculates the failure rate for each active process over the last 14 days.
+-- Business use: Helps monitor recent process reliability and identify processes with high failure rates.
 
 WITH error_count AS (
   SELECT p.name,
@@ -52,7 +54,8 @@ JOIN total_count AS t
   ON e.name = t.name
 ORDER BY ROUND(e.error_num/t.total_proc*100,2) DESC;
 
--- How many scripts each user started (ranking) descending order
+-- Ranks users based on the number of distinct batches they started.
+-- Business use: Provides visibility into user activity and process usage.
 
 WITH b_count AS (
   SELECT 
@@ -72,7 +75,8 @@ SELECT user_id,
 FROM b_count
 ORDER BY  DENSE_RANK() OVER (ORDER BY batch_count DESC);
 
--- What is the most common error for each process that was not already deleted from DB ?
+-- Identifies the most frequent error for each active process. 
+-- Business use: Helps identify the main issue affecting each process and prioritize troubleshooting.
 
 WITH diff_error_for_processes AS (
   SELECT 
@@ -104,7 +108,8 @@ SELECT
 FROM ranking
 WHERE ranking <= 1;
 
--- percentage distribution of each error type per process
+-- Calculates the percentage distribution of each error type within each process. 
+-- Business use: Helps understand which errors contribute most to process failures.
 
 WITH diff_error_for_processes AS (
   SELECT p.name, 
@@ -138,7 +143,8 @@ FROM diff_error_for_processes AS d
 JOIN total_errors_per_process AS t
   ON d.name = t.name;
 
--- Existent processes with no executions
+-- Identifies existing processes that have never been executed. 
+-- Business use: Helps identify unused processes and potential candidates for review or removal.
 
 SELECT p.process_id, 
   p.name, 
@@ -149,7 +155,8 @@ LEFT JOIN EXECUTIONS AS e
 ON p.process_id = e.process_id
 WHERE e.process_id IS NULL;
 
--- batches where the failure rate exceeded 30% for three consecutive batches of the same process
+-- Identifies processes with a failure rate above 30% for three consecutive batches. 
+-- Business use: Helps detect persistent reliability problems that require attention.
 
 WITH total_ex AS (
   SELECT user_id,
@@ -208,7 +215,8 @@ JOIN PROCESSES AS pr
   ON p.process_id = pr.process_id
 WHERE consecutive_fails = TRUE;
 
--- daily batches execution volume per weekday and movement compared to previous weekday
+-- Calculates the number of executions per weekday and compares the volume with the previous day. 
+-- Business use: Helps monitor execution patterns and identify significant changes in process activity.
 
 WITH daily_vol AS (
   SELECT 
@@ -267,27 +275,21 @@ SELECT
 FROM daily_movement
 ORDER BY process_id, day_num;
 
--- Per process average execution time / SUCCESFUL batch compared with the actual execution time of one batch + alert column for e difference bigger than for batches with 15% more execution time than the average
+-- Compares each batch's execution time with the average execution time of its process. 
+-- Business use: Helps identify unusually slow batches and potential performance degradation.
 
-WITH succes_filter AS (
+WITH avg_batch AS (
   SELECT
     process_id,
     batch_id,
-    executed_at,
-    CASE
-    WHEN status = 'SUCCESS' THEN 0
-    ELSE 1 END filter
+    TIMESTAMPDIFF(
+      SECOND,
+      MIN(executed_at),
+      MAX(executed_at)
+    ) AS batch_exec_time
   FROM EXECUTIONS
-  ),
-  
-avg_batch AS (
-  SELECT
-    process_id,
-    batch_id,
-    TIMESTAMPDIFF(SECOND,MIN(executed_at),MAX(executed_at)) AS batch_exec_time
-  FROM succes_filter
-  GROUP BY batch_id, process_id
-  HAVING SUM(filter) = 0
+  GROUP BY process_id, batch_id
+  HAVING COUNT(*) > 1
   ),
 
 avg_process AS (
@@ -302,17 +304,23 @@ SELECT
   p.process_id, 
   pr.name,
   b.batch_id,
-  CONCAT(ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2),'%') AS compared_to_average,
+  b.batch_exec_time,
+  p.avg_process_time,
+  CONCAT(
+    ROUND(((b.batch_exec_time / p.avg_process_time) - 1) * 100,2),'%') AS compared_to_average,
   CASE
-  WHEN ROUND((1 - (b.batch_exec_time/p.avg_process_time))*100,2) < 85 THEN 'ALERT'
-  ELSE 'OK' END AS alert_column
+    WHEN ((b.batch_exec_time / p.avg_process_time) - 1) * 100 > 30
+      THEN 'ALERT'
+    ELSE 'OK'
+  END AS alert_column
 FROM avg_batch AS b
 JOIN avg_process AS p
-ON b.process_id = p.process_id
+  ON b.process_id = p.process_id
 JOIN PROCESSES AS pr
-ON p.process_id = pr.process_id;
+  ON p.process_id = pr.process_id;
 
--- process reliability score + kpi's
+-- Provides key performance indicators for each active process, including executions, failures, failure rate and status. 
+-- Business use: Provides a high-level overview of process health for monitoring and BI dashboards.
 
 WITH process_kpi AS (
     SELECT
@@ -335,11 +343,12 @@ SELECT
     total_batches,
     total_executions,
     failed_executions,
-    ROUND(failed_executions / NULLIF(total_executions, 0) * 100,2) AS failure_rate,
-    last_execution,
+    COALESCE(ROUND(failed_executions / NULLIF(total_executions, 0) * 100,2),0) AS failure_rate,
+    COALESCE(last_execution,0),
     CASE
     WHEN failed_executions / NULLIF(total_executions, 0) > 0.30 THEN 'CRITICAL'
     WHEN failed_executions / NULLIF(total_executions, 0) > 0.10 THEN 'WARNING'
+    WHEN total_batches = 0 THEN 'NEVER USED'
     ELSE 'HEALTHY'
     END AS process_status
 FROM process_kpi
