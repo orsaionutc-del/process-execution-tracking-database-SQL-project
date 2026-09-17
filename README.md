@@ -196,6 +196,13 @@ The database does not track modifications performed inside the ERP after a file 
 The design assumes that each execution generates a single output file. If future requirements require multiple output files per execution, the schema would need to be extended.
 The database is intended for a small team and is not optimized for large-scale enterprise workloads involving millions of executions or file uploads.
 
+# In progress improvements:
+
+## Automated Testing Framework
+
+A pytest-based automated testing framework is being developed to validate the database layer, including stored procedures, views, tables, constraints and transactional integrity.
+
+**Documentation:** [Epic – Python Automated Testing Framework](User%20Stories/Pytest%20framework/Epic_story.md)
+
 ## Future improvements
-- Automated testing using pytest
 - BI dashboard for process execution and error analysis
