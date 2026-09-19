@@ -35,14 +35,14 @@ The framework will also be integrated into CI/CD so that automated tests can be 
 
 ## User stories links:
 
-| User Story                                                              | Status      |
-| :---                                                                    | :---        |
-| [AddProcess](%User%stories%stored%procedures/User Story - AddProcess.md)| In progress |
-| [ChangeName]                                                            | In progress |
-| [CorrectProcessName]                                                    | In progress |
-| [DeleteUser]                                                            | In progress |
-| [StartExecution]                                                        | In progress |
-| [CompleteExecutionSuccess]                                              | In progress |
-| [CompleteExectionFailure]                                               | In progress |
-| [CancelExecution]                                                       | In progress |
-| [CI/CD]                                                                 | In progress |   
+| User Story                                                                                           | Status      |
+| :---                                                                                                 | :---        |
+| [AddProcess](<User stories stored procedures/User Story - AddProcess.md>)                            | In progress |
+| [ChangeName](<User stories stored procedures/User Story - ChangeName.md>)                            | In progress |
+| [CorrectProcessName](<User stories stored procedures/User Story - CorrectProcessName.md>)            | In progress |
+| [DeleteUser](<User stories stored procedures/User Story - DeleteUser.md>)                            | In progress |
+| [StartExecution](<User stories stored procedures/User Story - StartExecution.md>)                    | In progress |
+| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompelteExecutionSuccess.md>)| In progress |
+| [CompleteExectionFailure](<User stories stored procedures/User Story - CompleteExecutionFailure.md>) | In progress |
+| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | In progress |
+| [CI/CD](<User stories stored procedures/User Story - CI CD.md>)                                      | In progress |   
