@@ -26,7 +26,7 @@
         user_id SMALLINT NOT NULL,
         batch_id INTEGER NOT NULL,
         executed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        status ENUM('SUCCESS','FAILED','RUNNING') NOT NULL,
+        status ENUM('SUCCESS','FAILED','RUNNING','CANCELLED') NOT NULL,
 
         FOREIGN KEY (process_id) REFERENCES PROCESSES(process_id),
         FOREIGN KEY (user_id) REFERENCES USERS(user_id),
@@ -166,50 +166,29 @@ CREATE VIEW process_execution_ranking AS
     JOIN PROCESSES AS p
     ON e.process_id = p.process_id;
 
--- Extract errors from batch stored procedure
-DELIMITER //
-CREATE PROCEDURE GetBatchErrors(IN param_batch_id INT)
-BEGIN
-    IF param_batch_id NOT IN (
-    SELECT batch_id 
-    FROM EXECUTIONS
-    ) 
-    THEN 
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'This batch does not exist';
-    END IF;
-    SELECT
-        e.execution_id,
-        e.executed_at,
-        e.status,
-        er.error_msg
-    FROM EXECUTIONS e
-    JOIN ERRORS er
-        ON e.execution_id = er.execution_id
-    WHERE e.batch_id = param_batch_id
-    ORDER BY e.executed_at DESC;
-END //
-DELIMITER ;
-
 --Insert another process in the PROCESSES table 
 DELIMITER //
 CREATE PROCEDURE AddProcess(IN param_process_name VARCHAR(100))
 BEGIN
+    
     IF param_process_name IS NULL
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Please do not insert a NULL value';
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Please do not insert a NULL value';
     END IF;
+
     IF param_process_name = ''
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'This is an empty value';
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'This is an empty value';
     END IF;
-    IF param_process_name IN (SELECT name FROM PROCESSES)
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'You already have this process in the database';
+
+    IF EXISTS (SELECT 1 FROM PROCESSES WHERE name = param_process_name)
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You already have this process in the database';
     END IF;
+
     INSERT INTO PROCESSES(name)
     VALUES(param_process_name);
 END //
@@ -219,17 +198,20 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE AddUser(IN param_fn VARCHAR(20), IN param_ln VARCHAR(20))
 BEGIN
+    
     IF EXISTS (
-    SELECT 1 
-    FROM USERS 
-    WHERE first_name = param_fn AND last_name = param_ln
-)
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'You already have this username in the database';
+        SELECT 1 
+        FROM USERS 
+        WHERE first_name = param_fn AND last_name = param_ln
+    )
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You already have this username in the database';
     END IF;
+
     INSERT INTO USERS(first_name, last_name)
     VALUES (param_fn, param_ln);
+
 END //
 DELIMITER ;
 
@@ -237,14 +219,16 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE ChangeName(IN param_fn VARCHAR(20),IN param_ln VARCHAR(20),IN par_id SMALLINT)
 BEGIN
+    
     IF EXISTS (
     SELECT 1 FROM USERS 
-    WHERE first_name = param_fn AND last_name = param_ln
-)
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'You already have this username in the database';
+        WHERE first_name = param_fn AND last_name = param_ln
+    )
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You already have this username in the database';
     END IF;
+
     UPDATE USERS
     SET first_name = param_fn , last_name = param_ln
     WHERE user_id = par_id;
@@ -255,28 +239,28 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE CorrectProcessName(IN wrong_name VARCHAR(100),IN correct_name VARCHAR(100))
 BEGIN
-    IF correct_name IN (SELECT name FROM PROCESSES)
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'This name already exists in DB';
+    
+    IF EXISTS (SELECT 1 FROM PROCESSES WHERE name = correct_name)
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'This name already exists in DB';
     END IF;
+
     IF correct_name = wrong_name
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Be careful, maybe you made a typo. You introduced the same  name.';
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Be careful, maybe you made a typo. You introduced the same  name.';
     END IF;
+
     IF wrong_name NOT IN (SELECT name FROM PROCESSES)
     THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'No changes were made. We could not find the row that you want to update.';
-    END IF;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No changes were made. We could not find the row that you want to update.';
+        END IF;
+
     UPDATE PROCESSES
     SET name = correct_name
-    WHERE process_id = (
-        SELECT process_id
-        FROM PROCESSES
-        WHERE name = wrong_name
-    );
+    WHERE name = wrong_name;
 END //
 DELIMITER ;
 
@@ -284,29 +268,63 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE DeleteUser( IN param_fn VARCHAR(20), IN param_ln VARCHAR(20))
 BEGIN
+
+    DECLARE validation_param SMALLINT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+    ROLLBACK;
+    RESIGNAL;
+    END;
+        
+    IF param_fn IS NULL OR TRIM(param_fn) = '' OR param_ln IS NULL OR TRIM(param_ln) = ''
+        THEN SIGNAL
+        SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Please do not provide NULL or empty values';
+    END IF;
+
+    SELECT user_id INTO validation_param
+    FROM USERS
+    WHERE first_name = param_fn AND last_name = param_ln AND (deleted IS NULL OR deleted = FALSE);
+
+    IF validation_param IS NULL
+        THEN SIGNAL
+        SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Please provide a valid user';
+    END IF;
+
+    START TRANSACTION;
     UPDATE USERS
     SET deleted = TRUE
-    WHERE user_id = (
-        SELECT user_id
-        FROM USERS
-        WHERE first_name = param_fn AND last_name = param_ln
-    );
+    WHERE user_id = validation_param;
+    COMMIT;
 END //
 DELIMITER ;
-;
 
 -- Script executions start
 DELIMITER //
 CREATE PROCEDURE StartExecution(IN param_process_id INT, IN param_user_id SMALLINT, IN param_input MEDIUMBLOB, OUT out_execution_id INT)
 BEGIN
+    
     DECLARE new_batch_id INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
     INSERT INTO BATCHES() VALUES();
     SET new_batch_id = LAST_INSERT_ID();
+
     INSERT INTO INPUTS(batch_id, input)
     VALUES (new_batch_id, param_input);
+
     INSERT INTO EXECUTIONS(process_id, user_id, batch_id, status)
     VALUES (param_process_id, param_user_id, new_batch_id, 'RUNNING');
     SET out_execution_id = LAST_INSERT_ID();
+    COMMIT;
 END //
 DELIMITER ;
 
@@ -314,25 +332,28 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE CompleteExecutionSuccess(IN param_execution_id INT, IN param_output MEDIUMBLOB)
     BEGIN
+    
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-    ROLLBACK;
-    RESIGNAL;
+        BEGIN
+        ROLLBACK;
+        RESIGNAL;
     END;
+
     IF NOT EXISTS (
-    SELECT 1 FROM EXECUTIONS 
-    WHERE execution_id = param_execution_id AND status = 'RUNNING'
-)
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'This execution does not exist or is not currently running.';
+        SELECT 1 FROM EXECUTIONS 
+        WHERE execution_id = param_execution_id AND status = 'RUNNING'
+    )
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'This execution does not exist or is not currently running.';
     END IF;
+
     START TRANSACTION;
-    UPDATE EXECUTIONS
-    SET status = 'SUCCESS'
-    WHERE execution_id = param_execution_id;
-    INSERT INTO OUTPUTS(execution_id, output)
-    VALUES (param_execution_id, param_output);
+        UPDATE EXECUTIONS
+        SET status = 'SUCCESS'
+        WHERE execution_id = param_execution_id;
+        INSERT INTO OUTPUTS(execution_id, output)
+        VALUES (param_execution_id, param_output);
     COMMIT;
 END //
 DELIMITER ;
@@ -341,19 +362,22 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE CompleteExecutionFailure (IN param_execution_id INT, IN param_error_msg VARCHAR(400))
 BEGIN
+    
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-    ROLLBACK;
-    RESIGNAL;
+        BEGIN
+        ROLLBACK;
+        RESIGNAL;
     END;
+
     IF NOT EXISTS (
-    SELECT 1 FROM EXECUTIONS 
-    WHERE execution_id = param_execution_id AND status = 'RUNNING'
-)
-    THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'This execution does not exist or is not currently running.';
+        SELECT 1 FROM EXECUTIONS 
+        WHERE execution_id = param_execution_id AND status = 'RUNNING'
+    )
+        THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'This execution does not exist or is not currently running.';
     END IF;
+
 START TRANSACTION;
     UPDATE EXECUTIONS
     SET status = 'FAILED'
@@ -361,5 +385,42 @@ START TRANSACTION;
     INSERT INTO ERRORS(execution_id, error_msg)
     VALUES (param_execution_id, param_error_msg);
 COMMIT;
+END //
+DELIMITER ;
+
+--Cancel execution in case of infinite loop
+DELIMITER //
+CREATE PROCEDURE CancelExecution(IN p_execution_id INT)
+BEGIN
+    
+    DECLARE param1 VARCHAR(20);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN 
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    IF p_execution_id IS NULL THEN 
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Provide a value that is not null.';
+    END IF;
+
+    SELECT status INTO param1
+    FROM EXECUTIONS
+    WHERE execution_id = p_execution_id; -- corectat "exection_id"
+
+    IF param1 IS NULL OR param1 != 'RUNNING' THEN -- adăugat "param1 IS NULL"
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Execution does not exist or status is not RUNNING';
+    END IF;
+
+    START TRANSACTION;
+    UPDATE EXECUTIONS 
+    SET status = 'CANCELLED' 
+    WHERE execution_id = p_execution_id;
+
+    COMMIT;
+
 END //
 DELIMITER ;
