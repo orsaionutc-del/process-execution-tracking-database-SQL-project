@@ -135,12 +135,12 @@ The database uses integer-based identifiers instead of storing repeated text val
 
 ### Six views were created for frequently used reporting purposes:
 
-- execution_summary -> combines process executions, batches, and errors to simplify troubleshooting and error analysis.  
-- failed_executions -> shows all the failed executions, identifies failed processes for troubleshooting and process improvement.  
-- execution_errors -> shows all the executions and the error messages 
-- process_statistics -> statistics regarding total processes and their success so we know what should improved
-- user_executions_statistics -> shows number of executions/user 
-- process_execution_ranking -> execution order + number of executions to build analysis for period of times and to display what are the most used processes 
+- `execution_summary` -> combines process executions, batches, and errors to simplify troubleshooting and error analysis.  
+- `failed_executions` -> shows all the failed executions, identifies failed processes for troubleshooting and process improvement.  
+- `execution_errors` -> shows all the executions and the error messages 
+- `process_statistics` -> statistics regarding total processes and their success so we know what should improved
+- `user_executions_statistics` -> shows number of executions/user 
+- `process_execution_ranking` -> execution order + number of executions to build analysis for period of times and to display what are the most used processes 
 
 
 ### Indexes may be created on frequently searched columns such as:
@@ -170,7 +170,7 @@ The database includes stored procedures for common process management and data v
 - `ChangeName` → updates a user's name after duplicate validation.
 - `CorrectProcessName` → corrects a process name while preventing duplicates.
 - `DeleteUser` → soft-deletes a user without removing historical execution data.
-- `GetBatchErrors` → retrieves errors associated with a specific batch.
+- `CancelExection` → retrieves errors associated with a specific batch.
 - `StartExecution` → creates a batch, stores the input file, and creates a `RUNNING` execution.
 - `CompleteExecutionSuccess` → changes the execution status to `SUCCESS` and stores the output file using a transaction.
 - `CompleteExecutionFailure` → changes the execution status to `FAILED` and stores the associated error using a transaction.
@@ -189,12 +189,12 @@ The `queries.sql` file contains queries demonstrating:
   
 ## Limitations
 
-The database was designed for a small team and focuses primarily on audit trail functionality rather than complete process management.
-The database stores input and output files as BLOB objects. While this preserves the original files for audit purposes, it increases storage requirements compared to storing only the processed data.
-
-The database does not track modifications performed inside the ERP after a file has been uploaded. It only records which files were processed and uploaded by each execution.
-The design assumes that each execution generates a single output file. If future requirements require multiple output files per execution, the schema would need to be extended.
-The database is intended for a small team and is not optimized for large-scale enterprise workloads involving millions of executions or file uploads.
+- Small-team scope: The database is designed for a small team and has not been optimized for enterprise-scale workloads.
+- File storage: Input and output files are stored as BLOBs, which increases database storage and backup requirements.
+- Concurrency: No job queue or worker architecture is implemented. Concurrent execution of the same process has not been fully designed for production workloads.
+- ERP traceability: The system tracks file processing and execution results but does not track changes made inside the ERP after upload.
+- Performance: The indexing strategy needs to be improved.
+- Recovery: Enterprise-level backup, replication, high availability, and disaster-recovery mechanisms are outside the current scope.
 
 # In progress improvements:
 
@@ -206,3 +206,7 @@ A pytest-based automated testing framework is being developed to validate the da
 
 ## Future improvements
 - BI dashboard for process execution and error analysis
+- Explore NoSQL storage, such as MongoDB, for file and document metadata
+- Create a separate test environment
+- Improve concurrency and scalability
+- Optimize database indexing and performance
