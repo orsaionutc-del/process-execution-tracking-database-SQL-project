@@ -11,7 +11,9 @@ The framework will also be integrated into CI/CD so that automated tests can be 
 ## User story
 
 **As** a developer
+
 **I want** an automatic testing framework that tests all stored procedures behaviour
+
 **So that** I can ensure database integrity is maintained after any schema or procedure change without manual testing
 
 ## In Scope:
