@@ -44,10 +44,10 @@ The framework will also be integrated into CI/CD so that automated tests can be 
 
 ## Master stories links:
 
-| Master Story                                                            | Status      |
-| :---                                                                    | :---        |
-| [Stored Procedures](Stored%20Procedures%20-%20User%20Story.md)          | In progress |
-| Views                                                                   | Not started |
-| Tables                                                                  | Not started |
-| Constraints                                                             | Not started |
-| CI/CD                                                                   | Not started |           
+| Master Story                                                                              | Status      |
+| :---                                                                                      | :---        |
+| [Stored Procedures](Stored%20Procedures%20-%20User%20Story/Master%20Story.md)             | In progress |
+| Views                                                                                     | Not started |
+| Tables                                                                                    | Not started |
+| Constraints                                                                               | Not started |
+| CI/CD                                                                                     | Not started |          
