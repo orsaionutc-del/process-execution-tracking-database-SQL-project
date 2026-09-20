@@ -23,7 +23,7 @@
 
 * Improvment of stored procedures
 
-## Technical scifications
+## Technical specifications
 
 * SQL component: AddProcess(IN param_process_name VARCHAR(100)) stored procedure that impacts PROCESSES table
 * Target Pytest file: `tests/test_AddProcess.py`
