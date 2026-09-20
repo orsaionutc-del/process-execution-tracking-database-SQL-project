@@ -73,4 +73,4 @@
 - [ ] Database fixture incorporates automatic `conn.rollback()` cleanup.
 - [ ] No database connection passwords or secrets are hardcoded.
 
-[← Back](../Master Story.md)
+[← Back](../Master%20Story.md)
