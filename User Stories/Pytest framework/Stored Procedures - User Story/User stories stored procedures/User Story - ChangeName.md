@@ -21,7 +21,7 @@
 
 ## Out of Scope
 
-* Improvment of stored procedures
+* Improvement of stored procedures
 
 ## Technical specifications
 
@@ -60,7 +60,7 @@
 
 * **Given** valid parameters `param_fn`, `param_ln`, `par_id`
 * **When** the procedure `ChangeName(param_fn, param_ln, par_id)` is called
-* **Then** a record with param_fn, param_ln, par_id is found in the PROCESSES table
+* **Then** a record with param_fn, param_ln, par_id is found in the USERS table
 * **And** the old record is updated
 
 ### AC-05 - no values from the database are changed trough the tests
