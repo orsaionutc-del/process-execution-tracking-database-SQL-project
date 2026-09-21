@@ -56,14 +56,21 @@
 * **Then** then the procedure returns `SQLSTATE '45000'`
 * **And** the message text contains `'You already have this user in the database'`
 
-### AC-04 - happy path
+### AC-04
+
+* **Given** a user ID that does not exist
+* **When** ChangeName('John', 'Smith', 9999) is called
+* **Then** then the procedure returns `SQLSTATE '45000'
+* **And** the message text contains `'You already have this user in the database'`
+
+### AC-05 - happy path
 
 * **Given** valid parameters `param_fn`, `param_ln`, `par_id`
 * **When** the procedure `ChangeName(param_fn, param_ln, par_id)` is called
 * **Then** a record with param_fn, param_ln, par_id is found in the USERS table
 * **And** the old record is updated
 
-### AC-05 - no values from the database are changed trough the tests
+### AC-06 - no values from the database are changed trough the tests
 * **Given** all the tests
 * **When** the tests are called
 * **Then** all changes that are made through the tests are rolled back
