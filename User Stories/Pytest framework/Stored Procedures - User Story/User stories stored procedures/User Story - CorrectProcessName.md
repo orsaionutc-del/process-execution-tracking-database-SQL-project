@@ -1,4 +1,4 @@
-# US-06 CorrectProcessName Automatic testing with Pytest
+# US-03 CorrectProcessName Automatic testing with Pytest
 
 ## Metadata & Estimation
 * **Epic / Master Story:** Master Stored Procedures
