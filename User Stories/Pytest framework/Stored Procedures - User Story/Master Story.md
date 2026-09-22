@@ -70,7 +70,7 @@ The business therefore requires an automated and repeatable way to:
 |US-03| [CorrectProcessName](<User stories stored procedures/User Story - CorrectProcessName.md>)            | Done | In progress |  
 |US-04| [DeleteUser](<User stories stored procedures/User Story - DeleteUser.md>)                            | Done | In progress |  
 |US-05| [StartExecution](<User stories stored procedures/User Story - StartExecution.md>)                    | Done | In progress |  
-|US-06| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompelteExecutionSuccess.md>)| Done | In progress |  
+|US-06| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompleteExecutionSuccess.md>)| Done | In progress |  
 |US-07| [CompleteExectionFailure](<User stories stored procedures/User Story - CompleteExecutionFailure.md>) | Done | In progress |  
 |US-08| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | Done | In progress |  
 |US-09| [CI/CD](<User stories stored procedures/User Story - CI CD.md>)                                      | Done | In progress |   
