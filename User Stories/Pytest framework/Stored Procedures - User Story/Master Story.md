@@ -63,16 +63,16 @@ The business therefore requires an automated and repeatable way to:
 
 ## User stories links:
 
-| User Story                                                                                           | Status      |
-| :---                                                                                                 | :---        |
-| [AddProcess](<User stories stored procedures/User Story - AddProcess.md>)                            | In progress |
-| [ChangeName](<User stories stored procedures/User Story - ChangeName.md>)                            | In progress |
-| [CorrectProcessName](<User stories stored procedures/User Story - CorrectProcessName.md>)            | In progress |
-| [DeleteUser](<User stories stored procedures/User Story - DeleteUser.md>)                            | In progress |
-| [StartExecution](<User stories stored procedures/User Story - StartExecution.md>)                    | In progress |
-| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompelteExecutionSuccess.md>)| In progress |
-| [CompleteExectionFailure](<User stories stored procedures/User Story - CompleteExecutionFailure.md>) | In progress |
-| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | In progress |
-| [CI/CD](<User stories stored procedures/User Story - CI CD.md>)                                      | In progress |   
+|US Number | User Story                                                                                      | Story Status| Development status|
+| :---| :---                                                                                                 | :---        | :--               |
+|US-01| [AddProcess](<User stories stored procedures/User Story - AddProcess.md>)                            | Done | In progress |  
+|US-02| [ChangeName](<User stories stored procedures/User Story - ChangeName.md>)                            | Done | In progress |  
+|US-03| [CorrectProcessName](<User stories stored procedures/User Story - CorrectProcessName.md>)            | Done | In progress |  
+|US-04| [DeleteUser](<User stories stored procedures/User Story - DeleteUser.md>)                            | Done | In progress |  
+|US-05| [StartExecution](<User stories stored procedures/User Story - StartExecution.md>)                    | Done | In progress |  
+|US-06| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompelteExecutionSuccess.md>)| Done | In progress |  
+|US-07| [CompleteExectionFailure](<User stories stored procedures/User Story - CompleteExecutionFailure.md>) | Done | In progress |  
+|US-08| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | Done | In progress |  
+|US-09| [CI/CD](<User stories stored procedures/User Story - CI CD.md>)                                      | Done | In progress |   
 
 [← Back](../Epic_story.md)
