@@ -202,7 +202,17 @@ The `queries.sql` file contains queries demonstrating:
 
 A pytest-based automated testing framework is being developed to validate the database layer, including stored procedures, views, tables, constraints and transactional integrity.
 
-**Documentation:** [Epic – Python Automated Testing Framework](User%20Stories/Pytest%20framework/Epic_story.md)
+To demonstrate business analytics skills and Agile methodology in this project we will provide user stories only for stored procedures and for CI/CD pipeline.
+
+**User stories:**  [Epic – Python Automated Testing Framework](User%20Stories/Pytest%20framework/Epic_story.md)
+**Documentation:**
+
+## Test driven development
+
+Using the tests written with Pytest as a source of truth we will develop the stored procedures
+
+**User stories:**
+**Documentation:**
 
 ## Future improvements
 - BI dashboard for process execution and error analysis
