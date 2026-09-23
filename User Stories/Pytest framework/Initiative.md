@@ -35,6 +35,7 @@ The Process Execution Tracking Database provides information used by the Automat
 * Automated testing of database constraints
 * Happy path and error handling test scenarios
 * CI/CD integration
+* TDD Development
 
 ## Out of Scope:
 

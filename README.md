@@ -204,7 +204,7 @@ A pytest-based automated testing framework is being developed to validate the da
 
 To demonstrate business analytics skills and Agile methodology in this project we will provide user stories only for stored procedures and for CI/CD pipeline.
 
-**User stories:**  [Initiative – Python Automated Testing Framework](User%20Stories/Pytest%20framework/Epic_story.md)
+**User stories:**  [Initiative – Python Automated Testing Framework](User%20Stories/Pytest%20framework/Initiative.md)
 **Documentation:**
 
 ## Test driven development

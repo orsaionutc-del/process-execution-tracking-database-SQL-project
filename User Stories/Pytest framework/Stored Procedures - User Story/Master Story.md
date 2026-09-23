@@ -2,64 +2,46 @@
 
 ## Description
 
-The purpose of this master story is to implement a part of the pytest framework that validates the behaviour of the stored procedures from Process Execution Tracking Database.
+The purpose of this Master Story is to define the automated validation required for the stored procedures within the Process Execution Tracking Database.
 
-The framework ensures that stored procedures handle both valid inputs and error scenarios correctly, and that transactional integrity is maintained after any database change.
+The validation ensures that stored procedures behave according to their expected requirements, handle valid and invalid scenarios correctly, and maintain database consistency after successful or failed operations.
 
-The framework will also be integrated into CI/CD so that automated tests can be executed consistently and regression issues can be identified early.
+## Expected Outcome
 
-## User story
+All in-scope stored procedures have repeatable automated validation covering their relevant functional and error scenarios.
 
-**As** a developer
+The automated tests provide evidence that changes to stored procedures do not introduce unintended behaviour or regressions.
 
-**I want** an automatic testing framework that tests all stored procedures behaviour
+## Scope
 
-**So that** I can ensure database integrity is maintained after any schema or procedure change without manual testing
+This Master Story covers the automated validation of stored procedures responsible for:
 
-## In Scope:
+- Process management
+- User management
+- Process execution lifecycle
 
-* Automated testing of stored procedures
-* Happy path and error handling scenarios
-* CI/CD integration
+## Acceptance Criteria
 
-## Out of Scope:
+- All in-scope stored procedures have automated tests.
+- Relevant happy-path scenarios are covered.
+- Relevant error and invalid-input scenarios are covered.
+- Tests validate the expected database state where applicable.
+- Failed operations do not leave unintended database changes.
+- Tests can be executed consistently using pytest.
+- The test suite provides repeatable feedback after database changes.
 
-* Testing the SQL scripts used to initially populate the database
-* Testing the automations
-* Bi Dashboard testing
-* End-to-end application testing outside the database layer
+## Requirement Coverage
 
-## Acceptance criteria
-
-* All stored procedures have at least one automated test
-* Both happy path and error handling scenarios are covered
-* Tests are executable with a single command (pytest)
-
-## Testing & Development Principles
-
-* Acceptance criteria are the source of truth for expected behaviour.
-* Every stored procedure must have automated tests covering its relevant happy path and error scenarios.
-* Tests should validate both the procedure response and the resulting database state where applicable.
-* A failing test must be analysed before deciding whether the issue is in the stored procedure, the test, or the test data/setup.
-* When the stored procedure does not satisfy the expected behaviour, development changes should be made to the procedure rather than weakening the test.
-* Automated tests should provide repeatable feedback after each development change.
-
-## Business Requirements
-
-The Process Execution Tracking Database is responsible for storing and managing process execution data. Stored procedures represent an important part of the database business logic and are responsible for operations such as creating processes, managing users, starting executions, completing executions, handling failures, and cancelling executions.
-
-Changes to stored procedures can directly affect the integrity and reliability of the execution tracking data.
-
-The business therefore requires an automated and repeatable way to:
-
-* Verify that stored procedures behave according to the defined requirements.
-* Detect incorrect behaviour introduced by database changes.
-* Prevent regressions when existing functionality is modified.
-* Ensure that invalid operations do not result in unintended database changes.
-* Provide confidence that critical database operations remain consistent over time.
-* Reduce reliance on manual database testing.
-* Provide fast feedback to developers during database changes.
-* Establish a foundation for a test-driven development process for database logic.
+| Initiative Requirement | Application to Stored Procedures |
+| :--- | :--- |
+| GBR-01 | Validate expected stored procedure behaviour |
+| GBR-02 | Verify database consistency after execution |
+| GBR-03 | Validate business rules enforced by procedures |
+| GBR-04 | Detect regressions in existing procedures |
+| GBR-05 | Validate error and invalid-input scenarios |
+| GBR-06 | Verify transactional integrity |
+| GBR-08 | Ensure repeatable test execution |
+| GBR-09 | Validate relevant changes before merge |
 
 ## User stories links:
 
@@ -72,7 +54,6 @@ The business therefore requires an automated and repeatable way to:
 |US-05| [StartExecution](<User stories stored procedures/User Story - StartExecution.md>)                    | Done | In progress |  
 |US-06| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompleteExecutionSuccess.md>)| Done | In progress |  
 |US-07| [CompleteExectionFailure](<User stories stored procedures/User Story - CompleteExecutionFailure.md>) | Done | In progress |  
-|US-08| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | Done | In progress |  
-|US-09| [CI/CD](<User stories stored procedures/User Story - CI CD.md>)                                      | Done | In progress |   
+|US-08| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | Done | In progress |
 
-[← Back](../Epic_story.md)
+[← Back](../Initiative.md)
