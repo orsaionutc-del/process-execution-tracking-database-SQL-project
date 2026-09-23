@@ -79,7 +79,6 @@
 - [ ] All 4 testing scenarios have dedicated PyTest functions in `tests/test_CancelExecution.py`.
 - [ ] Tests validate the expected SQLSTATE and error message.
 - [ ] Tests validate the resulting `EXECUTIONS` database state.
-- [ ] Database fixture incorporates automatic `conn.rollback()` cleanup.
 - [ ] No database connection passwords or secrets are hardcoded.
 
 [← Back](../Master%20Story.md)
