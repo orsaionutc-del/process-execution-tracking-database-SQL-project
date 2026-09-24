@@ -1,0 +1,90 @@
+[33m150e66d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Final Master Story - the scope of this change is to make the us as simple as posible only with AC DOD and Description and technical specifications
+[33m7695d06[m Master story and links repaired
+[33ma16befd[m Update BA documentation - future improvments on Master Story
+[33m9505f81[m push and refocus of stories
+[33mc3a077c[m Add pytest config and folder structure
+[33md6a846d[m Update README.md
+[33meeea3f4[m Update User Story - CancelExecution.md
+[33m593737a[m Update Master Story.md
+[33md8a2b56[m Update User Story - CompleteExecutionFailure.md
+[33m61e96fa[m Update User Story - CompleteExecutionSuccess.md
+[33m6db9ba0[m Update Master Story.md
+[33m02c982f[m Update User Story - CorrectProcessName.md
+[33m0d616c9[m Update User Story - CorrectProcessName.md
+[33ma47d2d3[m Update User Story - StartExecution.md
+[33ma03daa5[m Update User Story - DeleteUser.md
+[33m6ad3870[m Update Master Story.md
+[33m48048e4[m Update User Story - ChangeName.md
+[33m871e190[m Update User Story - ChangeName.md
+[33medd7722[m Update User Story - ChangeName.md
+[33me00acf6[m Update User Story - AddProcess.md
+[33md115540[m Update User Story - AddProcess.md
+[33m5f00d92[m Update User Story - AddProcess.md
+[33mc6fd6c0[m Update Epic_story.md
+[33mcf17c23[m Update User Story - AddProcess.md
+[33m78a1e1f[m Update Master Story.md
+[33m9710835[m Update Epic_story.md
+[33mba9e4c4[m Update Master Story.md
+[33m8343fa3[m Update Epic_story.md
+[33m85383ae[m Update User Story - AddProcess.md
+[33md32f53c[m Update Master Story.md
+[33md4f814d[m Add files via upload
+[33mb960080[m Update Master Story.md
+[33m28aac41[m Update Epic_story.md - stored procedure link added
+[33m62ebca0[m Update README.md - more improvments ideas
+[33mb410c73[m Update schema.sql - stored procedures corrections
+[33m8c11775[m Update README.md - add user stories link
+[33me784637[m Add user stories
+[33m08c0fb3[m Update inserts.sql - valid data for queries
+[33mf14f14a[m Update queries.sql - proper explanations and debugging
+[33md397b30[m Update queries.sql - some bugfixes
+[33m4b07149[m Mock data AI generated - add this to sql DB
+[33m30255cf[m Update queries.sql - repaid + kpi query
+[33m47a27a6[m Update queries.sql - review and repair later
+[33ma97301e[m Update queries.sql - added and deleted some queries
+[33mfdaec98[m Update README.md - stored procedures detail + error handling + future improvements
+[33m2c68b79[m Update schema.sql - comit + rollback
+[33m0b6daa8[m Update queries.sql
+[33m79cffaf[m Update DESIGN.md
+[33m29e3ce2[m Update DESIGN.md
+[33m750d7ee[m Update DESIGN.md
+[33m6a30dda[m Update DESIGN.md
+[33m64a041a[m Update README.md
+[33m62dac1f[m Update schema.sql
+[33mc9fc0e5[m Update README.md
+[33mbcfe949[m Update README.md
+[33me17c237[m Update README.md
+[33m1b98e84[m Update README.md
+[33mfdb425d[m Update README.md
+[33m58485f1[m Update README.md
+[33m0fdfbd2[m Update README.md
+[33m1c2279f[m Add files via upload
+[33m0c65522[m Delete Diagram.jpg
+[33m48c000c[m Update README.md
+[33m2e0907d[m Update DESIGN.md
+[33mf99162f[m Update DESIGN.md
+[33m5a5de60[m Add files via upload
+[33m58c09d5[m Delete Diagram.jpg
+[33m1ed40a5[m Update schema.sql
+[33m6a0126b[m Update README.md
+[33mb22bf6a[m Update schema.sql
+[33mf8f564c[m Update schema.sql
+[33m384743f[m Update schema.sql
+[33mc7d5ed3[m Update schema.sql
+[33ma17cf11[m Update schema.sql
+[33m70d89bf[m Update schema.sql
+[33mc813fe6[m Update schema.sql
+[33m52bbafb[m Update schema.sql
+[33mb7bf4c5[m Delete projects/sql_pivot_table directory
+[33m2611ecb[m Add files via upload
+[33m508f940[m Rename DESIGN.md to projects/sql_process_db_project/DESIGN.md
+[33m76bcfee[m Update README.md
+[33m73aa0e6[m Create README.md
+[33m54cd25e[m Update queries.sql
+[33mce44a4f[m Update queries.sql
+[33m327b191[m Update schema.sql
+[33m5e608bb[m Update DESIGN.md
+[33med515c7[m Update DESIGN.md
+[33m625b5d3[m Update DESIGN.md
+[33m25d3f73[m automated commit by submit50
+[33m73b2454[m automated commit by submit50
