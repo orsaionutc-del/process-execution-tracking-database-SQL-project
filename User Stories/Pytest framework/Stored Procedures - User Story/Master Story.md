@@ -14,34 +14,65 @@ The automated tests provide evidence that changes to stored procedures do not in
 
 ## Scope
 
-This Master Story covers the automated validation of stored procedures responsible for:
+The following stored procedures are included in this Master Story.
 
-- Process management
-- User management
-- Process execution lifecycle
+- `AddProcess`
+- `CorrectProcessName`
+- `ChangeName`
+- `DeleteUser`
+- `StartExecution`
+- `CompleteExecutionSuccess`
+- `CompleteExecutionFailure`
+- `CancelExecution`
 
-## Acceptance Criteria
+### Testing Scope
 
-- All in-scope stored procedures have automated tests.
-- Relevant happy-path scenarios are covered.
-- Relevant error and invalid-input scenarios are covered.
-- Tests validate the expected database state where applicable.
-- Failed operations do not leave unintended database changes.
-- Tests can be executed consistently using pytest.
-- The test suite provides repeatable feedback after database changes.
+The automated testing scope includes, where applicable:
 
-## Requirement Coverage
+- Successful execution scenarios
+- Invalid input scenarios
+- Error handling
+- Business rule validation
+- Expected database state after successful operations
+- Database state after failed operations
+- Transactional integrity
+- Regression validation
 
-| Initiative Requirement | Application to Stored Procedures |
-| :--- | :--- |
-| GBR-01 | Validate expected stored procedure behaviour |
-| GBR-02 | Verify database consistency after execution |
-| GBR-03 | Validate business rules enforced by procedures |
-| GBR-04 | Detect regressions in existing procedures |
-| GBR-05 | Validate error and invalid-input scenarios |
-| GBR-06 | Verify transactional integrity |
-| GBR-08 | Ensure repeatable test execution |
-| GBR-09 | Validate relevant changes before merge |
+---
+
+## Out of Scope
+
+The following are outside the scope of this Master Story:
+
+- Testing of database views
+- Testing of tables and their structure or behaviour
+- Testing of database constraints as separate database components
+- Testing of SQL scripts used to initially populate the database
+- Testing of RPA/Automation processes
+- BI dashboard testing
+- End-to-end application testing outside the database layer
+- CI/CD implementation
+
+These areas are addressed separately within the **Python automated testing framework** initiative.
+
+## Requirement Traceability
+
+This Master Story provides coverage for the Initiative requirements relevant to automated validation of stored procedures.
+
+| Initiative Requirement | Covered by this Master Story | Related User Stories |
+| :--- | :--- | :--- |
+| **GBR-01 — Database Behaviour Validation** | Validate expected stored procedure behaviour | US-01–US-08 |
+| **GBR-02 — Data Integrity** | Validate database state after stored procedure execution | US-01–US-08 |
+| **GBR-03 — Business Rule Validation** | Validate business rules enforced by stored procedures | US-01–US-08 |
+| **GBR-04 — Regression Prevention** | Provide automated regression coverage for stored procedures | US-01–US-08 |
+| **GBR-05 — Error Handling** | Validate invalid inputs and stored procedure error scenarios | US-01–US-08 |
+| **GBR-06 — Transactional Integrity** | Validate database consistency after failed operations | US-04–US-08 |
+| **GBR-07 — Database Component Coverage** | Provide automated coverage for the stored procedure component | US-01–US-08 |
+| **GBR-08 — Repeatable Testing** | Execute stored procedure validation repeatedly using pytest | US-01–US-08 |
+| **GBR-09 — Change Validation** | Validate stored procedure changes before merge | US-01–US-08 |
+| **GBR-10 — CI/CD Integration** | Make stored procedure tests executable within the CI/CD process | US-01–US-08 |
+
+Detailed Acceptance Criteria are defined within each User Story and are validated through the corresponding automated pytest tests.
 
 ## User stories links:
 
@@ -55,5 +86,20 @@ This Master Story covers the automated validation of stored procedures responsib
 |US-06| [CompleteExecutionSuccess](<User stories stored procedures/User Story - CompleteExecutionSuccess.md>)| Done | In progress |  
 |US-07| [CompleteExectionFailure](<User stories stored procedures/User Story - CompleteExecutionFailure.md>) | Done | In progress |  
 |US-08| [CancelExecution](<User stories stored procedures/User Story - CancelExecution.md>)                  | Done | In progress |
+
+## Definition of Done
+
+This Master Story is complete when:
+
+- All eight stored procedures have corresponding User Stories.
+- Each User Story has defined and testable Acceptance Criteria.
+- Relevant Acceptance Criteria have corresponding automated pytest tests.
+- Relevant successful and error scenarios are covered.
+- Applicable business rules are validated.
+- Expected database state is validated after successful operations.
+
+### Traceability Flow
+
+**Initiative Requirement → Master Story → User Story → Acceptance Criteria → Automated Test**
 
 [← Back](../Initiative.md)
