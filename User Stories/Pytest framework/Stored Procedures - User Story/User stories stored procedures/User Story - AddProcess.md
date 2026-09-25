@@ -13,16 +13,6 @@
 
 **So that** I can ensure database integrity is maintained after any schema or procedure change without manual testing
 
-## In Scope
-
-* Automated testing of AddProcess
-* Happy path and error handling scenarios
-* Database should remain in the initial state
-
-## Out of Scope
-
-* Improvment of stored procedures
-
 ## Technical specifications
 
 * SQL component: AddProcess(IN param_process_name VARCHAR(100)) stored procedure that impacts PROCESSES table
@@ -44,8 +34,8 @@
 
 ### AC-02 - empty string error handling
 
-* **Given** invalid parameter - ' ' parameter
-* **When** the procedure `AddProcess(' ')` is called
+* **Given** invalid parameter - '' OR '    ' parameter
+* **When** the procedure `AddProcess('')` is called
 * **Then** then the procedure returns `SQLSTATE '45000'`
 * **And** the message text contains `'This is an empty value'`
 
@@ -69,8 +59,8 @@
 
 ## Definition of done checklist
 
-- [ ] All 4 testing scenarios have dedicated PyTest functions in `tests/test_AddProcess.py`.
-- [ ] Database fixture incorporates automatic `conn.rollback()` cleanup.
+- [ ] All 5 testing scenarios have dedicated PyTest functions in `tests/test_AddProcess.py`.
 - [ ] No database connection passwords or secrets are hardcoded.
+- [ ] After the test is done the database returns to it's intial state.
 
 [← Back](../Master%20Story.md)

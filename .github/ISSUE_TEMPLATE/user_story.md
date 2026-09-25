@@ -1,10 +1,15 @@
 ---
 name: User Story
-about: User story with acceptance criteria and definition of done
+about: User story with acceptance criteria, tehnical specifications and definition of done
 labels: user-story
 ---
 
 # US-[XX] [Procedure Name] Automatic testing with PyTest
+
+## Metadata & Estimation
+* **Epic / Master Story:** 
+* **Story Points:**
+* **Status:**
 
 ## User Story
 
